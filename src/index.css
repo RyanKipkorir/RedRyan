@@ -1,0 +1,655 @@
+@import url("https://fonts.googleapis.com/css2?family=Comforter&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Just+Another+Hand&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Comforter";
+  src: url("/fonts/Comforter.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Vietnam";
+  src: url("/fonts/Vietnam.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Hand";
+  src: url("/fonts/Hand.ttf") format("truetype");
+}
+@theme {
+  --color-red: #ff0000;
+  --color-dark: #111314;
+
+  --font-vietnam: "Vietnam", sans-serif;
+  --font-quote: "Be Vietnam Pro", "Vietnam", sans-serif;
+  --font-hand: "Hand", "Just Another Hand", cursive;
+  --font-mono: "Space Mono", ui-monospace, SFMono-Regular, monospace;
+}
+html,
+body {
+  width: 100%;
+  background-color: #ff0000;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+@utility flex-center {
+  @apply flex justify-center items-center;
+}
+
+@utility col-center {
+  @apply flex flex-col justify-center items-center;
+}
+
+@utility abs-center {
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+@layer components {
+  main {
+    @apply w-full overflow-x-hidden;
+  }
+
+  nav {
+    @apply fixed z-50 w-full;
+
+    div {
+      @apply flex md:flex-row flex-col md:justify-between items-center gap-5 py-5 lg:px-0 px-5 container mx-auto;
+    }
+
+    p {
+      @apply font-vietnam text-3xl -mb-2;
+    }
+
+    a {
+      @apply cursor-pointer text-nowrap md:text-base text-sm;
+      mix-blend-mode: difference;
+    }
+
+    ul {
+      @apply flex-center lg:gap-12 gap-7;
+    }
+  }
+
+  .noisy {
+    @apply absolute inset-0 size-full bg-[url("/images/noise.png")];
+  }
+  .mix {
+    mix-blend-mode: difference;
+  }
+
+  /* ═════════════════════════ HERO ═════════════════════════ */
+  #hero {
+    @apply relative z-10 min-h-dvh w-full overflow-clip bg-black text-red;
+
+    a {
+      @apply cursor-pointer text-red transition-colors duration-300;
+
+      &:hover {
+        @apply text-white;
+      }
+    }
+
+    /* two equal-width buttons (scoped so the generic link hover doesn't recolor them) */
+    .hero-btn {
+      @apply relative isolate flex items-center justify-between gap-4 overflow-hidden rounded-full border-2 px-6 py-4 font-mono text-sm font-bold text-black md:py-5 xl:text-base;
+
+      &::before {
+        content: "";
+        @apply absolute inset-0 -z-10;
+        transform: translateY(101%);
+        transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+      }
+
+      span:last-child {
+        transition: transform 0.3s ease;
+      }
+
+      &:hover {
+        @apply text-black;
+
+        &::before {
+          transform: translateY(0);
+        }
+
+        span:last-child {
+          transform: translate(4px, 4px);
+        }
+      }
+    }
+
+    .hero-btn--red {
+      @apply border-red bg-red;
+
+      &::before {
+        @apply bg-white;
+      }
+
+      &:hover {
+        @apply border-white;
+      }
+    }
+
+    .hero-btn--white {
+      @apply border-white bg-white;
+
+      &::before {
+        @apply bg-red;
+      }
+
+      &:hover {
+        @apply border-red;
+      }
+    }
+  }
+
+  /* MetaBalls — right side */
+  .hero-balls {
+    @apply absolute top-0 right-0 z-0 h-full w-full lg:w-[55%];
+  }
+
+  .hero-noise {
+    @apply pointer-events-none z-20 opacity-20;
+  }
+
+  /* layout (no z-index here, so the text can blend with the balls behind it) */
+  .hero-inner {
+    @apply container mx-auto pointer-events-none relative flex min-h-dvh flex-col justify-between px-5 pt-28 pb-24 lg:px-0 lg:pt-32;
+    --hero-fs: clamp(4.5rem, min(18vw, 24dvh), 19rem);
+
+    /* let the mouse reach the balls, but keep links and list items clickable */
+    :is(a, li) {
+      @apply pointer-events-auto;
+    }
+  }
+
+  /* red text turns black where it crosses a red ball */
+  .hero-word,
+  .hero-aside,
+  .hero-small,
+  .hero-vertical,
+  .hero-sphere {
+    mix-blend-mode: difference;
+  }
+
+  .hero-main {
+    @apply flex flex-col gap-8 lg:gap-10;
+  }
+
+  .hero-small {
+    @apply font-mono text-xs md:text-sm;
+  }
+
+  /* big type */
+  .hero-rows {
+    @apply flex flex-col gap-4 lg:gap-0;
+  }
+
+  .hero-row {
+    @apply flex flex-col lg:flex-row lg:items-center lg:gap-10;
+  }
+
+  .hero-row--ryan {
+    @apply lg:justify-start;
+
+    .hero-word {
+      @apply order-first lg:order-none;
+    }
+
+    .hero-aside {
+      @apply text-left lg:mb-6 lg:self-end lg:text-right;
+    }
+  }
+
+  .hero-row--red .hero-aside {
+    @apply lg:mt-6 lg:ml-auto lg:max-w-[24ch] lg:self-start;
+  }
+
+  .hero-word {
+    @apply flex font-mono font-bold select-none;
+    font-size: var(--hero-fs);
+    line-height: 0.82;
+    letter-spacing: -0.06em;
+  }
+
+  .hero-letter {
+    @apply relative inline-block;
+  }
+
+  .hero-glyph {
+    @apply pointer-events-none absolute text-red;
+    left: var(--gx, 50%);
+    top: var(--gy, 50%);
+    width: var(--gs, 0.3em);
+    height: var(--gs, 0.3em);
+    margin-left: calc(var(--gs, 0.3em) / -2);
+    margin-top: calc(var(--gs, 0.3em) / -2);
+  }
+
+  /* the two buttons: same width as the RYAN word, equal columns */
+  .hero-cta {
+    @apply grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4;
+    width: min(100%, max(28rem, calc(var(--hero-fs) * 2.16)));
+  }
+
+  /* side text */
+  .hero-aside {
+    @apply font-mono text-xs leading-relaxed md:text-sm;
+  }
+
+  .hero-statement::after {
+    content: "_";
+    animation: hero-blink 1s steps(1) infinite;
+  }
+
+  .hero-list {
+    @apply flex list-none flex-col gap-1;
+
+    li {
+      @apply cursor-default text-left;
+    }
+  }
+
+  .hero-list-n {
+    @apply mr-2 opacity-70;
+  }
+
+  /* bottom right */
+  .hero-meta {
+    @apply flex items-center justify-end pt-6;
+  }
+
+  .hero-meta-group {
+    @apply flex flex-wrap items-center gap-4 md:gap-6;
+  }
+
+  .hero-sphere {
+    @apply size-14 md:size-20;
+  }
+
+  .hero-vertical {
+    @apply absolute top-1/2 right-3 z-10 hidden -translate-y-1/2 font-mono text-xs lg:block;
+    writing-mode: vertical-rl;
+  }
+
+  .hero-scroll {
+    @apply absolute bottom-0 left-1/2 z-10 flex h-[72px] w-16 -translate-x-1/2 flex-col items-center gap-2 overflow-hidden font-mono text-[10px] tracking-widest uppercase;
+  }
+
+  .hero-scroll-line {
+    @apply block h-12 w-px bg-current;
+  }
+
+  /* ═════════════════════════ ABOUT ═════════════════════════ */
+  #about {
+    @apply relative z-0 min-h-dvh w-full overflow-hidden bg-black text-red;
+
+    a {
+      @apply cursor-pointer text-red transition-colors duration-300;
+
+      &:hover {
+        @apply text-white;
+      }
+    }
+
+    .about-top {
+      @apply bg-red text-black;
+
+      &:hover {
+        @apply bg-white text-black;
+      }
+    }
+  }
+
+  .about-inner {
+    @apply container mx-auto relative grid grid-cols-1 gap-y-10 px-5 pt-28 pb-44 lg:grid-cols-12 lg:gap-x-6 lg:px-0 lg:pt-32;
+  }
+
+  .about-greeting {
+    @apply col-span-full flex font-mono font-bold select-none lg:col-span-8 lg:row-start-1;
+    font-size: clamp(4.5rem, 13.5vw, 14rem);
+    line-height: 0.95;
+    letter-spacing: -0.06em;
+  }
+
+  .about-mask {
+    @apply inline-flex items-center overflow-hidden;
+    padding: 0.02em 0 0.14em;
+    margin-bottom: -0.14em;
+  }
+
+  .about-star {
+    display: block;
+    width: 0.52em;
+    height: 0.52em;
+    margin: 0 0.04em;
+  }
+
+  .about-name {
+    @apply lg:col-span-5 lg:row-start-2;
+  }
+
+  .about-intro {
+    @apply font-mono text-lg md:text-2xl;
+  }
+
+  .about-fullname {
+    @apply font-mono text-3xl font-bold md:text-5xl;
+    letter-spacing: -0.03em;
+  }
+
+  .about-portrait {
+    @apply lg:col-span-3 lg:row-start-3;
+    width: 300px;
+    height: auto;
+  }
+
+  .about-col {
+    @apply flex flex-col gap-6 font-mono text-xs leading-relaxed md:text-[13px];
+  }
+
+  .about-col--a {
+    @apply lg:col-span-3 lg:col-start-6 lg:row-span-2 lg:row-start-2;
+  }
+
+  .about-col--b {
+    @apply lg:col-span-3 lg:col-start-10 lg:row-span-3 lg:row-start-1 lg:pt-6;
+  }
+
+  .about-top {
+    @apply absolute right-5 bottom-0 flex size-24 items-center justify-center font-mono text-sm transition-colors duration-300 lg:right-0;
+  }
+
+  .about-top-line {
+    @apply absolute -top-12 left-1/2 h-12 w-px bg-red;
+  }
+
+  /* ═════════════════════════ WORK / PROJECTS ═════════════════════════ */
+  #work {
+    @apply relative z-0 w-full bg-red text-dark;
+
+    a {
+      @apply cursor-pointer transition-colors duration-300;
+
+      &:hover {
+        @apply text-white;
+      }
+    }
+
+    /* Visit button */
+    .proj-visit {
+      @apply inline-flex items-center gap-3 rounded-full border-2 border-dark bg-dark px-8 py-4 font-mono text-sm font-bold text-red md:text-base;
+
+      span {
+        transition: transform 0.3s ease;
+      }
+
+      &:hover {
+        @apply bg-white text-dark;
+
+        span {
+          transform: translate(4px, -4px);
+        }
+      }
+    }
+
+    /* lab tiles */
+    .proj-tile {
+      @apply flex flex-col justify-between gap-6 border-2 border-red bg-black p-5 font-mono text-red transition-colors duration-300;
+
+      strong {
+        @apply block text-base md:text-lg;
+      }
+
+      small {
+        @apply mt-1 block text-xs opacity-80;
+      }
+
+      &:hover {
+        @apply border-white bg-white text-black;
+
+        .proj-icon {
+          transform: rotate(14deg) scale(1.1);
+        }
+      }
+    }
+  }
+
+  /* default (mobile / reduced motion): stacked */
+  .work-pin {
+    @apply relative w-full;
+  }
+
+  .work-track {
+    @apply flex flex-col gap-28 px-5 py-24;
+  }
+
+  .work-panel {
+    @apply relative flex flex-col gap-8;
+  }
+
+  .work-panel--intro {
+    @apply gap-3 py-16;
+  }
+
+  .work-panel--outro {
+    @apply gap-4 py-16;
+  }
+
+  .work-title {
+    @apply font-mono font-bold select-none;
+    font-size: clamp(4rem, 14vw, 14rem);
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+
+    span {
+      display: block;
+    }
+  }
+
+  .work-title-outline {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--color-dark);
+  }
+
+  .work-count {
+    @apply align-top font-mono text-base font-normal md:text-2xl;
+    letter-spacing: 0;
+    color: var(--color-dark);
+    -webkit-text-stroke: 0;
+  }
+
+  .work-sub {
+    @apply font-hand text-4xl leading-none md:text-6xl;
+  }
+
+  .work-hint {
+    @apply font-mono text-sm;
+  }
+
+  .work-more {
+    @apply font-mono text-3xl font-bold md:text-6xl;
+    letter-spacing: -0.04em;
+  }
+
+  .work-progress {
+    @apply absolute bottom-0 left-0 hidden h-1.5 w-full bg-dark/20;
+  }
+
+  .work-progress-bar {
+    @apply block h-full w-full origin-left bg-dark;
+    transform: scaleX(0);
+  }
+
+  /* project text */
+  .proj-text {
+    @apply relative z-10 flex flex-col items-start gap-5;
+  }
+
+  .proj-meta {
+    @apply flex w-full items-center justify-between gap-6 border-b-2 border-dark pb-3 font-mono text-xs md:text-sm;
+  }
+
+  .proj-name {
+    @apply font-mono font-bold;
+    font-size: clamp(2.25rem, 11vw, 4rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    overflow-wrap: anywhere;
+
+    @media (min-width: 1024px) {
+      font-size: clamp(2rem, 3.6vw, 5.5rem);
+    }
+  }
+
+  .proj-blurb {
+    @apply max-w-[40ch] font-mono text-sm leading-relaxed;
+  }
+
+  .proj-tags {
+    @apply flex flex-wrap gap-2;
+
+    li {
+      @apply rounded-full border-2 border-dark px-3 py-1 font-mono text-xs;
+    }
+  }
+
+  .proj-index {
+    @apply pointer-events-none absolute z-0 font-mono font-bold select-none;
+    right: 0;
+    top: -1rem;
+    font-size: clamp(8rem, 30vw, 14rem);
+    line-height: 0.8;
+    letter-spacing: -0.06em;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(17, 19, 20, 0.25);
+  }
+
+  /* browser mockup */
+  .proj-mock {
+    @apply relative z-10 block w-full;
+  }
+
+  .proj-frame {
+    @apply overflow-hidden border-2 border-dark bg-dark transition-transform duration-500 ease-out;
+    box-shadow: 10px 10px 0 var(--color-dark);
+    transition:
+      transform 0.5s ease,
+      box-shadow 0.5s ease;
+  }
+
+  .proj-mock:hover .proj-frame {
+    transform: translate(-6px, -6px) rotate(-0.6deg);
+    box-shadow: 18px 18px 0 var(--color-dark);
+  }
+
+  .proj-bar {
+    @apply flex items-center gap-4 border-b-2 border-red/40 bg-dark px-4 py-3;
+  }
+
+  .proj-dots {
+    @apply flex gap-2;
+
+    i {
+      @apply block size-3 rounded-full border-2 border-red;
+
+      &:first-child {
+        @apply bg-red;
+      }
+    }
+  }
+
+  .proj-url {
+    @apply truncate rounded-full bg-red/10 px-4 py-1 font-mono text-xs text-red;
+  }
+
+  .proj-shot {
+    @apply relative aspect-[16/10] overflow-hidden bg-black;
+
+    img {
+      @apply relative z-10 block h-auto w-full will-change-transform;
+    }
+  }
+
+  .proj-fallback {
+    @apply absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center font-mono text-red;
+
+    span {
+      @apply font-bold;
+      font-size: clamp(1.5rem, 4vw, 4rem);
+      letter-spacing: -0.05em;
+    }
+
+    small {
+      @apply text-[10px] opacity-70;
+    }
+  }
+
+  /* lab (personal experiments) */
+  .proj-lab {
+    @apply grid grid-cols-1 gap-3 bg-black p-3 md:grid-cols-3 lg:aspect-[16/10];
+  }
+
+  .proj-icon {
+    @apply size-20 transition-transform duration-500 ease-out lg:size-24;
+  }
+
+  /* desktop: pinned horizontal scroll */
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    .work-pin {
+      @apply h-dvh overflow-hidden;
+    }
+
+    .work-track {
+      @apply h-full w-max flex-row items-center gap-0 p-0;
+    }
+
+    .work-panel {
+      @apply h-full w-screen flex-none flex-row items-center gap-[4vw] px-[6vw] pt-28 pb-16;
+    }
+
+    .work-panel--intro,
+    .work-panel--outro {
+      @apply flex-col items-start justify-center gap-4;
+    }
+
+    .proj-text {
+      @apply w-[min(26vw,26rem)] flex-none;
+    }
+
+    .proj-mock {
+      @apply flex-none;
+      width: min(54vw, 62rem, calc((100dvh - 14rem) * 1.6));
+    }
+
+    .proj-index {
+      left: 4vw;
+      right: auto;
+      top: auto;
+      bottom: -3vw;
+      font-size: 26vw;
+    }
+
+    .work-progress {
+      @apply block;
+    }
+  }
+}
+
+@keyframes hero-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes work-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .proj-icon--spin {
+    animation: work-spin 24s linear infinite;
+  }
+}
