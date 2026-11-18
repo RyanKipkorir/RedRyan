@@ -1,6 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Comforter&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Just+Another+Hand&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 @import "tailwindcss";
@@ -25,6 +27,8 @@
   --font-quote: "Be Vietnam Pro", "Vietnam", sans-serif;
   --font-hand: "Hand", "Just Another Hand", cursive;
   --font-mono: "Space Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-effect: "Inter Tight", "Be Vietnam Pro", sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
 }
 html,
 body {
@@ -280,88 +284,122 @@ body {
     @apply block h-12 w-px bg-current;
   }
 
-  /* ═════════════════════════ ABOUT ═════════════════════════ */
-  #about {
+  /* ═════════════════════════ STORY ═════════════════════════ */
+  #story {
     @apply relative z-0 min-h-dvh w-full overflow-hidden bg-black text-red;
 
     a {
-      @apply cursor-pointer text-red transition-colors duration-300;
+      @apply cursor-pointer transition-colors duration-300;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.18em;
+
+      /* split chars are inline-block, so the underline has to sit on them */
+      .story-char {
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.18em;
+      }
 
       &:hover {
-        @apply text-white;
+        @apply bg-red;
+
+        &,
+        .story-word,
+        .story-char {
+          color: #000 !important;
+        }
       }
     }
 
-    .about-top {
-      @apply bg-red text-black;
+    strong {
+      @apply font-bold text-white;
+    }
 
-      &:hover {
-        @apply bg-white text-black;
-      }
+    em {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 1.1em;
+      letter-spacing: 0;
     }
   }
 
-  .about-inner {
-    @apply container mx-auto relative grid grid-cols-1 gap-y-10 px-5 pt-28 pb-44 lg:grid-cols-12 lg:gap-x-6 lg:px-0 lg:pt-32;
+  /* default (reduced motion): beats stack vertically */
+  .story-stage {
+    @apply relative z-10 flex flex-col gap-28 px-5 py-28 lg:px-[6vw];
   }
 
-  .about-greeting {
-    @apply col-span-full flex font-mono font-bold select-none lg:col-span-8 lg:row-start-1;
-    font-size: clamp(4.5rem, 13.5vw, 14rem);
-    line-height: 0.95;
-    letter-spacing: -0.06em;
+  .story-beat {
+    @apply flex w-full flex-col items-center gap-6 text-center;
   }
 
-  .about-mask {
-    @apply inline-flex items-center overflow-hidden;
-    padding: 0.02em 0 0.14em;
-    margin-bottom: -0.14em;
+  /* with motion: one pinned screen, beats stacked in the same cell */
+  @media (prefers-reduced-motion: no-preference) {
+    .story-stage {
+      @apply grid min-h-dvh place-items-center py-24;
+    }
+
+    .story-beat {
+      grid-area: 1 / 1;
+    }
   }
 
-  .about-star {
-    display: block;
-    width: 0.52em;
-    height: 0.52em;
-    margin: 0 0.04em;
+  .story-big {
+    @apply text-red;
+    font-family: var(--font-effect);
+    font-weight: 700;
+    font-size: clamp(2rem, 6vw, 7.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    max-width: 14em;
+    text-wrap: balance;
   }
 
-  .about-name {
-    @apply lg:col-span-5 lg:row-start-2;
+  .story-text {
+    font-family: var(--font-effect);
+    font-weight: 400;
+    font-size: clamp(1.15rem, 2.5vw, 2.4rem);
+    line-height: 1.28;
+    letter-spacing: -0.02em;
+    max-width: 26em;
   }
 
-  .about-intro {
-    @apply font-mono text-lg md:text-2xl;
+  /* the setback: story on the left, counter on the right */
+  .story-beat--3 {
+    @apply grid items-center gap-10 text-left lg:grid-cols-[1.3fr_1fr] lg:gap-[6vw];
   }
 
-  .about-fullname {
-    @apply font-mono text-3xl font-bold md:text-5xl;
-    letter-spacing: -0.03em;
+  .story-tale {
+    @apply flex flex-col gap-6;
   }
 
-  .about-portrait {
-    @apply lg:col-span-3 lg:row-start-3;
-    width: 300px;
-    height: auto;
+  .story-line {
+    font-family: var(--font-effect);
+    font-weight: 400;
+    font-size: clamp(1.15rem, 2.4vw, 2.3rem);
+    line-height: 1.28;
+    letter-spacing: -0.02em;
+    max-width: 24em;
   }
 
-  .about-col {
-    @apply flex flex-col gap-6 font-mono text-xs leading-relaxed md:text-[13px];
+  /* days since suspended */
+  .story-counter {
+    @apply flex min-h-56 flex-col items-center justify-center gap-4 border-y border-red/40 py-6 lg:items-end lg:text-right;
   }
 
-  .about-col--a {
-    @apply lg:col-span-3 lg:col-start-6 lg:row-span-2 lg:row-start-2;
+  .story-counter-num {
+    @apply flex min-h-24 items-center justify-center lg:justify-end;
+    font-family: var(--font-effect);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--color-red);
   }
 
-  .about-col--b {
-    @apply lg:col-span-3 lg:col-start-10 lg:row-span-3 lg:row-start-1 lg:pt-6;
-  }
-
-  .about-top {
-    @apply absolute right-5 bottom-0 flex size-24 items-center justify-center font-mono text-sm transition-colors duration-300 lg:right-0;
-  }
-
-  .about-top-line {
-    @apply absolute -top-12 left-1/2 h-12 w-px bg-red;
+  /* blinking red dot before the label */
+  .story-live {
+    @apply mr-2 inline-block size-2 rounded-full bg-red align-middle;
+    animation: story-pulse 1.4s ease-in-out infinite;
   }
 
   /* ═════════════════════════ WORK / PROJECTS ═════════════════════════ */
@@ -433,7 +471,7 @@ body {
   }
 
   .work-panel--outro {
-    @apply gap-4 py-16;
+    @apply gap-4 py-16 bg-dark;
   }
 
   .work-title {
@@ -634,6 +672,176 @@ body {
       @apply block;
     }
   }
+  /* ═════════════════════════ CONTACT ═════════════════════════
+   paste inside @layer components, after #work */
+  #contact {
+    @apply relative z-0 flex min-h-dvh w-full flex-col overflow-hidden bg-dark text-white;
+
+    .contact-inner {
+      @apply container mx-auto flex flex-1 flex-col justify-center gap-8 px-5 py-24 lg:gap-10 lg:px-0;
+    }
+
+    /* ---------- copy ---------- */
+    .contact-title {
+      @apply font-mono font-bold select-none;
+      font-size: clamp(3.5rem, 12vw, 12rem);
+      line-height: 0.85;
+      letter-spacing: -0.06em;
+
+      span {
+        display: block;
+      }
+    }
+
+    .contact-sub {
+      @apply font-effect text-xl md:text-3xl;
+      letter-spacing: -0.02em;
+      max-width: 24em;
+    }
+
+    .contact-hint {
+      @apply font-mono text-xs opacity-60 md:text-sm;
+    }
+
+    /* ---------- the scene: red ball, white dominos, dark ground ---------- */
+    .contact-scene {
+      --r: clamp(1.4rem, 3.4vw, 2.6rem); /* ball radius */
+      --tw: clamp(0.6rem, 1.6vw, 1.1rem); /* domino width */
+      --th: clamp(4rem, 12vw, 7rem); /* domino height */
+      --tg: clamp(1.6rem, 4.6vw, 3.2rem); /* gap between dominos */
+
+      @apply relative flex items-end justify-end;
+      gap: var(--tg);
+      height: var(--th);
+      /* room for the last domino to land inside the container */
+      padding-right: calc(var(--th) * 0.95);
+      border-bottom: 2px solid rgb(255 255 255 / 0.3);
+    }
+
+    .contact-ball {
+      @apply absolute bottom-0 left-0 rounded-full will-change-transform;
+      width: calc(var(--r) * 2);
+      aspect-ratio: 1;
+      background: var(--color-red);
+
+      /* a dark notch so you can see it roll */
+      &::after {
+        content: "";
+        position: absolute;
+        top: 14%;
+        left: 50%;
+        width: 22%;
+        aspect-ratio: 1;
+        translate: -50% 0;
+        border-radius: 50%;
+        background: var(--color-dark);
+      }
+    }
+
+    .contact-tile {
+      @apply block flex-none bg-white will-change-transform;
+      width: var(--tw);
+      height: var(--th);
+      border-radius: 2px;
+      transform-origin: 100% 100%;
+    }
+
+    /* ---------- social links (same fill-up hover as the hero buttons) ---------- */
+    .contact-socials {
+      @apply flex list-none flex-wrap gap-3 md:gap-4;
+    }
+
+    .contact-link {
+      @apply relative isolate flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-full border-2 border-white px-6 py-4 font-mono text-sm font-bold text-white md:text-base;
+      transition: border-color 0.3s ease;
+
+      &::before {
+        content: "";
+        @apply absolute inset-0 -z-10 bg-red;
+        transform: translateY(101%);
+        transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+      }
+
+      span:last-child {
+        transition: transform 0.3s ease;
+      }
+
+      &:hover,
+      &:focus-visible {
+        border-color: var(--color-red);
+
+        &::before {
+          transform: translateY(0);
+        }
+
+        span:last-child {
+          transform: translate(4px, -4px);
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 3px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .contact-hint {
+        display: none;
+      }
+    }
+  }
+  /* ═════════════════════════ FOOTER ═════════════════════════
+   paste inside @layer components, after #contact */
+  #footer {
+    /* dark behind the red edge, so the dip and the bounce read against it */
+    @apply relative z-10 w-full bg-dark text-dark;
+
+    /* the red shape IS the footer; overflow visible so the elastic
+     overshoot can spring above the top edge */
+    .footer-wave {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+      pointer-events: none;
+
+      path {
+        fill: var(--color-red);
+      }
+    }
+
+    .noisy {
+      @apply pointer-events-none opacity-20;
+    }
+
+    .footer-inner {
+      @apply container relative z-10 mx-auto flex flex-col gap-5 px-5 pb-8 md:flex-row md:items-end md:justify-between lg:px-0;
+      /* clears the dip of the curve before it flattens */
+      padding-top: clamp(4.5rem, 9vw, 6rem);
+    }
+
+    .footer-quote {
+      @apply flex flex-col gap-3;
+    }
+
+    .footer-quote p {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(1.5rem, 3.2vw, 2.6rem);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      max-width: 28ch;
+      text-wrap: balance;
+    }
+
+    .footer-quote figcaption,
+    .footer-copy {
+      @apply font-mono text-xs font-bold md:text-sm;
+    }
+  }
 }
 
 @keyframes hero-blink {
@@ -651,5 +859,10 @@ body {
 @media (prefers-reduced-motion: no-preference) {
   .proj-icon--spin {
     animation: work-spin 24s linear infinite;
+  }
+}
+@keyframes story-pulse {
+  50% {
+    opacity: 0.2;
   }
 }

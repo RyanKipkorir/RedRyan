@@ -318,9 +318,9 @@ const Projects = () => {
 
           {/* outro panel */}
           <div className="work-panel work-panel--outro">
-            <p className="work-sub proj-reveal">That’s the reel.</p>
+            <p className="work-sub proj-reveal text-white">That’s the reel.</p>
             <a
-              className="work-more proj-reveal"
+              className="work-more proj-reveal text-red"
               href={GITHUB}
               target="_blank"
               rel="noreferrer"

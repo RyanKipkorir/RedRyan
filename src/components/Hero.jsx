@@ -95,12 +95,11 @@ const Sphere = () => (
   </svg>
 );
 
-const Word = ({ letters, glyphs = {} }) => (
+const Word = ({ letters = {} }) => (
   <div className="hero-word" aria-hidden="true">
     {letters.map((ch, i) => (
       <span key={i} className="hero-letter">
         {ch}
-        {glyphs[i]}
       </span>
     ))}
   </div>
@@ -278,31 +277,11 @@ const Hero = () => {
         <div className="hero-main">
           <div className="hero-rows">
             <div className="hero-row hero-row--red">
-              <Word
-                letters={RED}
-                glyphs={{
-                  2: (
-                    <Burst
-                      className="hero-glyph hero-spin"
-                      style={{ "--gx": "52%", "--gy": "56%", "--gs": "0.26em" }}
-                    />
-                  ),
-                }}
-              />
+              <Word letters={RED} />
             </div>
 
             <div className="hero-row hero-row--ryan">
-              <Word
-                letters={RYAN}
-                glyphs={{
-                  0: (
-                    <Blob
-                      className="hero-glyph"
-                      style={{ "--gx": "56%", "--gy": "36%", "--gs": "0.2em" }}
-                    />
-                  ),
-                }}
-              />
+              <Word letters={RYAN} />
               <p className="hero-aside hero-statement hero-reveal">
                 <span className="hero-statement-text">
                   Defining is limiting,

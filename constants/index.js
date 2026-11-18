@@ -85,15 +85,6 @@ const PROJECTS = [
     url: "#",
     image: "/images/redkeep.jpg",
   },
-  {
-    id: "lab",
-    name: "Personal experiments",
-    kind: "The lab",
-    blurb: "Unity games, mathematical visualizations and Web3 experiments.",
-    tags: ["Unity", "Math", "Web3"],
-    url: GITHUB,
-    lab: true,
-  },
 ];
 
 export { navLinks, socials, PROJECTS };
