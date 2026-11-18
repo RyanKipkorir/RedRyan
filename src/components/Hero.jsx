@@ -25,7 +25,7 @@ const SERVICES = [
 ];
 
 const ACTIONS = [
-  { label: "Explore my work", href: "#work", tone: "red" },
+  { label: "My work", href: "#work", tone: "red" },
   { label: "Who is Red?", href: "#about", tone: "white" },
 ];
 
@@ -282,14 +282,12 @@ const Hero = () => {
 
             <div className="hero-row hero-row--ryan">
               <Word letters={RYAN} />
-              <p className="hero-aside hero-statement hero-reveal">
-                <span className="hero-statement-text">
-                  Defining is limiting,
-                  <br />
-                  but here is what I do
-                </span>
-              </p>
             </div>
+            <p className="hero-aside hero-statement hero-reveal">
+              <span className="hero-statement-text">
+                Defining is limiting, but here is what I do
+              </span>
+            </p>
           </div>
 
           {/* two equal-width buttons */}
@@ -316,22 +314,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-
-      <p className="hero-vertical hero-reveal" aria-hidden="true">
-        {PROFILE.location} — Portfolio {PROFILE.year}
-      </p>
-
-      <a
-        href="#about"
-        className="hero-scroll hero-reveal"
-        aria-label="Scroll to about"
-        onClick={(e) => goTo(e, "#about")}
-        onMouseEnter={lineIn}
-        onMouseLeave={lineOut}
-      >
-        Scroll
-        <span className="hero-scroll-line" />
-      </a>
 
       <div className="noisy hero-noise" />
     </section>

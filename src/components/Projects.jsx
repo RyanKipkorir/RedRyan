@@ -211,9 +211,7 @@ const Projects = () => {
           <div className="work-panel work-panel--intro">
             <h2 className="work-title">
               <span className="proj-reveal">Selected</span>
-              <span className="work-title-outline proj-reveal">
-                Work<sup className="work-count">({pad(PROJECTS.length)})</sup>
-              </span>
+              <span className="work-title-outline proj-reveal">Work</span>
             </h2>
             <p className="work-sub proj-reveal">Things I’ve built</p>
             <p className="work-hint proj-reveal">Scroll →</p>
@@ -222,18 +220,11 @@ const Projects = () => {
           {/* project panels */}
           {PROJECTS.map((p, i) => (
             <article key={p.id} className="work-panel">
-              <span className="proj-index" aria-hidden="true">
-                {pad(i + 1)}
-              </span>
-
               <div className="proj-text">
                 <p className="proj-meta proj-reveal">
-                  <span>
-                    {pad(i + 1)} / {pad(PROJECTS.length)}
-                  </span>
-                  <span>{p.kind}</span>
+                  <h3 className="proj-name proj-reveal">{p.name}</h3>
                 </p>
-                <h3 className="proj-name proj-reveal">{p.name}</h3>
+                <span>{pad(i + 1)}</span>
                 <p className="proj-blurb proj-reveal">{p.blurb}</p>
                 <ul className="proj-tags proj-reveal">
                   {p.tags.map((t) => (

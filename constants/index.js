@@ -16,21 +16,21 @@ const navLinks = [
     title: "Contact",
   },
 ];
-const socials = [
+const SOCIALS = [
   {
-    name: "Instagram",
-    icon: "/images/insta.png",
-    url: "#",
+    label: "X",
+    icon: "/images/socials/x.png",
+    href: "#",
   },
   {
-    name: "X (Twitter)",
-    icon: "/images/x.png",
-    url: "#",
+    label: "Discord",
+    icon: "/images/socials/discord.png",
+    href: "#",
   },
   {
-    name: "Facebook",
-    icon: "/images/fb.png",
-    url: "#",
+    label: "Telegram",
+    icon: "/images/socials/telegram.png",
+    href: "#",
   },
 ];
 const GITHUB = "https://github.com/RedRedRyan";
@@ -39,9 +39,8 @@ const PROJECTS = [
     id: "ystudios",
     name: "YStudios",
     kind: "Software & film studio",
-    blurb:
-      "Website for a software and film studio, designed and developed end to end.",
-    tags: ["Studio site", "Frontend", "Design"],
+    blurb: "A software and film studio, co-founded with alumni from MMU.",
+    tags: ["Software", "Film", "Music"],
     url: "#",
     image: "/images/ystudios.jpg",
   },
@@ -50,7 +49,7 @@ const PROJECTS = [
     name: "NBX",
     kind: "Tokenizing equities & bonds",
     blurb:
-      "The front door to NBX: tokenized equities and bonds, designed and developed from scratch.",
+      "A platform tokenizing equities and bonds on Hedera.Incubated by The NSE",
     tags: ["Web3", "Fintech", "Tokenization"],
     url: "#",
     image: "/images/nbx.jpg",
@@ -80,11 +79,11 @@ const PROJECTS = [
     name: "RedKeep",
     kind: "Notebook app · Landing page",
     blurb:
-      "Landing page for RedKeep, a notebook app, designed and developed with motion at its core.",
+      "A notebook app, designed and developed with secrecy at its core with dissappearing messages.",
     tags: ["Landing page", "React", "GSAP"],
     url: "#",
     image: "/images/redkeep.jpg",
   },
 ];
 
-export { navLinks, socials, PROJECTS };
+export { navLinks, SOCIALS, PROJECTS };

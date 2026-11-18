@@ -66,6 +66,13 @@ const Footer = () => {
       <div className="noisy" aria-hidden="true" />
 
       <div className="footer-inner">
+        <div>
+          <img
+            src="/images/sculpture.png"
+            className="size-24 lg:size-42  xl:size-48"
+          />
+          <p className="footer-copy">© {new Date().getFullYear()}</p>
+        </div>
         <figure className="footer-quote">
           <blockquote>
             <p>
@@ -75,8 +82,6 @@ const Footer = () => {
           </blockquote>
           <figcaption>— Aristotle</figcaption>
         </figure>
-
-        <p className="footer-copy">© {new Date().getFullYear()}</p>
       </div>
     </footer>
   );
