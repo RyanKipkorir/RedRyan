@@ -2,23 +2,17 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { PROJECTS } from "../../constants";
+import {
+  GITHUB,
+  PROJECT_BAND_COUNT,
+  PROJECT_FINALE_TITLE,
+  PROJECT_LAB,
+  PROJECTS,
+  SECTION_IDS,
+} from "../../constants/index.js";
+import Skills from "./Skills";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
-
-/* ───────────── edit me ─────────────
-   image → screenshot URL, served from /public (for example /images/site.jpg)
-   url   → live link for the Visit button                                         */
-const GITHUB = "https://github.com/RedRedRyan";
-
-const LAB = [
-  { title: "Unity games", text: "Prototypes and playable worlds." },
-  {
-    title: "Math visualizations",
-    text: "Curves, surfaces and things that move.",
-  },
-  { title: "Web3 experiments", text: "Onchain ideas, tested in public." },
-];
 
 const pad = (n) => String(n).padStart(2, "0");
 const isExternal = (u) => u.startsWith("http");
@@ -95,6 +89,30 @@ const Projects = () => {
   const { contextSafe } = useGSAP(
     () => {
       const mm = gsap.matchMedia();
+      const el = root.current;
+      const finale = el.querySelector(".fin");
+      const bands = el.querySelector(".fin-bands");
+
+      /* finale effect: the bands skew with scroll velocity and trail a streak of the next color */
+      gsap.set(bands, { "--posv": 0 });
+      const skewTo = gsap.quickTo(bands, "skewX", {
+        duration: 0.5,
+        ease: "power3",
+      });
+      const streakTo = gsap.quickTo(bands, "--posv", {
+        duration: 0.5,
+        ease: "power3",
+      });
+
+      const onVelocity = (self) => {
+        const v = self.getVelocity() / 1400;
+        skewTo(gsap.utils.clamp(-18, 18, v * 5));
+        streakTo(gsap.utils.clamp(0, 1, Math.abs(v) / 1.7));
+      };
+      const settle = () => {
+        skewTo(0);
+        streakTo(0);
+      };
 
       /* desktop: pinned horizontal scroll (CodePen pattern) */
       mm.add(
@@ -107,19 +125,22 @@ const Projects = () => {
             x: () => -distance(),
             ease: "none",
             scrollTrigger: {
-              trigger: root.current,
+              trigger: el,
               start: "top top",
               end: () => "+=" + distance(),
               pin: pin.current,
               scrub: 1,
               anticipatePin: 1,
               invalidateOnRefresh: true,
-              onUpdate: (self) =>
-                gsap.set(".work-progress-bar", { scaleX: self.progress }),
+              onUpdate: (self) => {
+                gsap.set(".work-progress-bar", { scaleX: self.progress });
+                onVelocity(self);
+              },
+              onScrubComplete: settle,
             },
           });
 
-          root.current.querySelectorAll(".work-panel").forEach((panel) => {
+          el.querySelectorAll(".work-panel").forEach((panel) => {
             const intro = panel.classList.contains("work-panel--intro");
             const mock = panel.querySelector(".proj-mock");
 
@@ -132,7 +153,7 @@ const Projects = () => {
               ease: "power3.out",
               scrollTrigger: intro
                 ? {
-                    trigger: root.current,
+                    trigger: el,
                     start: "top 60%",
                     toggleActions: "play none none reverse",
                   }
@@ -163,6 +184,36 @@ const Projects = () => {
               );
             }
           });
+
+          /* the finale: bands slide in as the last panel arrives, words and skills play when it's active */
+          gsap.fromTo(
+            bands,
+            { xPercent: 0 },
+            {
+              xPercent: -50,
+              ease: "none",
+              scrollTrigger: {
+                trigger: finale,
+                containerAnimation: slide,
+                start: "left right",
+                end: "left left",
+                scrub: true,
+              },
+            },
+          );
+
+          ScrollTrigger.create({
+            trigger: finale,
+            containerAnimation: slide,
+            start: "left 60%",
+            toggleClass: { targets: finale, className: "active" },
+          });
+
+          el.classList.add("fin-armed");
+          return () => {
+            el.classList.remove("fin-armed");
+            settle();
+          };
         },
       );
 
@@ -170,7 +221,7 @@ const Projects = () => {
       mm.add(
         "(max-width: 1023px) and (prefers-reduced-motion: no-preference)",
         () => {
-          root.current.querySelectorAll(".work-panel").forEach((panel) => {
+          el.querySelectorAll(".work-panel").forEach((panel) => {
             gsap.from(panel.querySelectorAll(".proj-reveal"), {
               y: 40,
               opacity: 0,
@@ -180,6 +231,36 @@ const Projects = () => {
               scrollTrigger: { trigger: panel, start: "top 80%" },
             });
           });
+
+          gsap.fromTo(
+            bands,
+            { xPercent: 0 },
+            {
+              xPercent: -50,
+              ease: "none",
+              scrollTrigger: {
+                trigger: finale,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true,
+                onUpdate: onVelocity,
+                onLeave: settle,
+                onLeaveBack: settle,
+              },
+            },
+          );
+
+          ScrollTrigger.create({
+            trigger: finale,
+            start: "top 70%",
+            toggleClass: { targets: finale, className: "active" },
+          });
+
+          el.classList.add("fin-armed");
+          return () => {
+            el.classList.remove("fin-armed");
+            settle();
+          };
         },
       );
 
@@ -204,7 +285,7 @@ const Projects = () => {
   });
 
   return (
-    <section id="work" ref={root}>
+    <section id={SECTION_IDS.projects} ref={root}>
       <div className="work-pin" ref={pin}>
         <div className="work-track" ref={track}>
           {/* intro panel */}
@@ -253,7 +334,7 @@ const Projects = () => {
                       <span className="proj-url">~/lab</span>
                     </div>
                     <div className="proj-lab">
-                      {LAB.map((item, k) => (
+                      {PROJECT_LAB.map((item, k) => (
                         <a
                           key={item.title}
                           className="proj-tile"
@@ -307,17 +388,43 @@ const Projects = () => {
             </article>
           ))}
 
-          {/* outro panel */}
-          <div className="work-panel work-panel--outro">
-            <p className="work-sub proj-reveal text-white">That’s the reel.</p>
-            <a
-              className="work-more proj-reveal text-red"
-              href={GITHUB}
-              target="_blank"
-              rel="noreferrer"
-            >
-              More on GitHub ↗
-            </a>
+          {/* finale: sliding color bands + outlined words, with the skills ring */}
+          <div className="work-panel work-panel--outro fin">
+            <div className="fin-bands" aria-hidden="true">
+              {Array.from({ length: PROJECT_BAND_COUNT }, (_, i) => (
+                <i key={i} className="fin-band" style={{ "--i": i }} />
+              ))}
+            </div>
+
+            <div className="fin-copy">
+              <h2
+                className="fin-title"
+                aria-label={PROJECT_FINALE_TITLE.join(" ")}
+              >
+                {PROJECT_FINALE_TITLE.map((w, i) => (
+                  <span
+                    key={i}
+                    className="fin-word"
+                    data-word={w}
+                    style={{ "--i": i }}
+                    aria-hidden="true"
+                  >
+                    {w}
+                  </span>
+                ))}
+              </h2>
+              <p className="work-sub proj-reveal">Tools I reach for</p>
+              <a
+                className="proj-visit proj-reveal"
+                href={GITHUB}
+                target="_blank"
+                rel="noreferrer"
+              >
+                More on GitHub <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+
+            <Skills className="proj-reveal" />
           </div>
         </div>
 

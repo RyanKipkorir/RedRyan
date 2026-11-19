@@ -1,21 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 
-import { navLinks } from "../../constants/index.js";
-
-/* ---- values to change ---- */
-const OPEN = 0.9; // seconds the circle takes to open
-const CLOSE = 0.65; // seconds the circle takes to close
-const RISE = [0.9, 0.07]; // seconds each link takes to rise, and the gap between links
-const TILT = 6; // degrees a link leans while it rises
-const NUDGE = 16; // pixels the pointed link moves right
-
-/* swap the placeholder handles for your real ones */
-const FOOT = [
-  { label: "GitHub", href: "https://github.com/redlitelighter" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/your-handle" },
-  { label: "X", href: "https://x.com/your-handle" },
-];
+import { navLinks, NAV_ANIMATION, NAV_FOOT } from "../../constants/index.js";
 
 /* jump to a section. A section pinned by ScrollTrigger is measured by its
    pin-spacer, which stays where the section started. */
@@ -159,13 +145,13 @@ const Navbar = () => {
         l.classList.toggle("is-here", hit);
         if (REDUCED) return;
         gsap.to(masks[i], {
-          x: hit ? NUDGE : 0,
+          x: hit ? NAV_ANIMATION.nudge : 0,
           duration: hit ? 0.55 : 0.45,
           ease: "power3.out",
           overwrite: "auto",
         });
         gsap.to(arrows[i], {
-          x: hit ? NUDGE : 0,
+          x: hit ? NAV_ANIMATION.nudge : 0,
           opacity: hit ? 1 : 0,
           duration: hit ? 0.55 : 0.3,
           ease: "power3.out",
@@ -248,27 +234,31 @@ const Navbar = () => {
       } else {
         tl.to(reveal, {
           r: centre.far,
-          duration: OPEN,
+          duration: NAV_ANIMATION.open,
           ease: "power3.inOut",
           onUpdate: draw,
         })
           .fromTo(
             words,
-            { yPercent: 118, rotation: TILT, transformOrigin: "0% 100%" },
+            {
+              yPercent: 118,
+              rotation: NAV_ANIMATION.tilt,
+              transformOrigin: "0% 100%",
+            },
             {
               yPercent: 0,
               rotation: 0,
-              duration: RISE[0],
+              duration: NAV_ANIMATION.rise[0],
               ease: "power4.out",
-              stagger: RISE[1],
+              stagger: NAV_ANIMATION.rise[1],
             },
-            OPEN * 0.38,
+            NAV_ANIMATION.open * 0.38,
           )
           .fromTo(
             foot,
             { opacity: 0, y: 14 },
             { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" },
-            OPEN * 0.7,
+            NAV_ANIMATION.open * 0.7,
           );
       }
 
@@ -276,7 +266,7 @@ const Navbar = () => {
         tl.call(
           () => open && links[0].focus({ preventScroll: true }),
           null,
-          REDUCED ? 0.05 : OPEN * 0.5,
+          REDUCED ? 0.05 : NAV_ANIMATION.open * 0.5,
         );
       }
     };
@@ -303,7 +293,7 @@ const Navbar = () => {
       } else {
         tl.to(words, {
           yPercent: -118,
-          rotation: -TILT / 2,
+          rotation: -NAV_ANIMATION.tilt / 2,
           duration: 0.45,
           ease: "power3.in",
           stagger: { each: 0.04, from: "end" },
@@ -311,7 +301,12 @@ const Navbar = () => {
           .to(foot, { opacity: 0, y: -8, duration: 0.3, ease: "power2.in" }, 0)
           .to(
             reveal,
-            { r: 0, duration: CLOSE, ease: "power3.inOut", onUpdate: draw },
+            {
+              r: 0,
+              duration: NAV_ANIMATION.close,
+              ease: "power3.inOut",
+              onUpdate: draw,
+            },
             0.18,
           );
       }
@@ -398,7 +393,7 @@ const Navbar = () => {
     <>
       <header id="nav" ref={bar}>
         <div className="nav-inner">
-          <a href="#hero" className="nav-logo">
+          <a href={`#${navLinks[0].id}`} className="nav-logo">
             <img src="/images/logo.png" alt="logo" />
             <p>Red</p>
           </a>
@@ -453,7 +448,7 @@ const Navbar = () => {
           </ul>
 
           <div className="menu-foot" data-foot>
-            {FOOT.map(({ label, href }) => (
+            {NAV_FOOT.map(({ label, href }) => (
               <a
                 key={label}
                 href={href}

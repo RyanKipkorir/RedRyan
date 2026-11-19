@@ -4,35 +4,19 @@ import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
 import { useGSAP } from "@gsap/react";
 import MetaBalls from "@/components/MetaBalls";
+import { ArrowBigRight } from "lucide-react";
+import {
+  HERO_ACTIONS,
+  HERO_PROFILE,
+  HERO_RED_LETTERS,
+  HERO_RYAN_LETTERS,
+  HERO_SCRAMBLE_CHARS,
+  HERO_SERVICES,
+  HERO_STATEMENT,
+  SECTION_IDS,
+} from "../../constants/index.js";
 
 gsap.registerPlugin(ScrollToPlugin, ScrambleTextPlugin, useGSAP);
-
-/* ───────────── edit me ───────────── */
-const PROFILE = {
-  handle: "@RedRedRyan",
-  github: "https://github.com/RyanKipkorir",
-  email: "ryan@ystudios.co.ke",
-  location: "Nairobi, KE",
-  year: new Date().getFullYear(),
-};
-
-const STATEMENT = "Defining is limiting, but here is what I do";
-
-const SERVICES = [
-  { n: "01", label: "UI/UX" },
-  { n: "02", label: "Game Dev" },
-  { n: "03", label: "Breathe AIR, Write Scripts" },
-];
-
-const ACTIONS = [
-  { label: "My work", href: "#work", tone: "red" },
-  { label: "Who is Red?", href: "#about", tone: "white" },
-];
-
-const RED = ["R", "E", "D"];
-const RYAN = ["R", "Y", "A", "N"];
-
-const SCRAMBLE_CHARS = "01<>/\\{}[]=+*#%&?ΣπΔ∫";
 
 /* ───────────── little SVG pieces ───────────── */
 const Burst = ({ className = "", style }) => {
@@ -167,8 +151,8 @@ const Hero = () => {
               duration: 2.6,
               ease: "none",
               scrambleText: {
-                text: STATEMENT,
-                chars: SCRAMBLE_CHARS,
+                text: HERO_STATEMENT,
+                chars: HERO_SCRAMBLE_CHARS,
                 revealDelay: 0.4,
                 speed: 0.5,
               },
@@ -176,7 +160,7 @@ const Hero = () => {
             1.2,
           );
 
-        SERVICES.forEach(({ label }, i) => {
+        HERO_SERVICES.forEach(({ label }, i) => {
           const at = 1.8 + i * 0.4;
           tl.to(
             `.hero-list li:nth-child(${i + 1})`,
@@ -189,7 +173,7 @@ const Hero = () => {
               ease: "none",
               scrambleText: {
                 text: label,
-                chars: SCRAMBLE_CHARS,
+                chars: HERO_SCRAMBLE_CHARS,
                 revealDelay: 0.2,
                 speed: 0.6,
               },
@@ -249,12 +233,12 @@ const Hero = () => {
     gsap.to(el, {
       duration: 0.9,
       overwrite: true,
-      scrambleText: { text: label, chars: SCRAMBLE_CHARS, speed: 0.8 },
+      scrambleText: { text: label, chars: HERO_SCRAMBLE_CHARS, speed: 0.8 },
     });
   });
 
   return (
-    <section id="hero" ref={root}>
+    <section id={SECTION_IDS.home} ref={root}>
       {/* right side — MetaBalls */}
       <div className="hero-balls" aria-hidden="true">
         <MetaBalls
@@ -277,11 +261,11 @@ const Hero = () => {
         <div className="hero-main">
           <div className="hero-rows">
             <div className="hero-row hero-row--red">
-              <Word letters={RED} />
+              <Word letters={HERO_RED_LETTERS} />
             </div>
 
             <div className="hero-row hero-row--ryan">
-              <Word letters={RYAN} />
+              <Word letters={HERO_RYAN_LETTERS} />
             </div>
             <p className="hero-aside hero-statement hero-reveal">
               <span className="hero-statement-text">
@@ -292,7 +276,7 @@ const Hero = () => {
 
           {/* two equal-width buttons */}
           <div className="hero-cta">
-            {ACTIONS.map(({ label, href, tone }) => (
+            {HERO_ACTIONS.map(({ label, href, tone }) => (
               <a
                 key={href}
                 href={href}
@@ -300,7 +284,9 @@ const Hero = () => {
                 onClick={(e) => goTo(e, href)}
               >
                 <span>{label}</span>
-                <span aria-hidden="true">↘</span>
+                <span aria-hidden="true">
+                  <ArrowBigRight />
+                </span>
               </a>
             ))}
           </div>
@@ -309,7 +295,7 @@ const Hero = () => {
         {/* bottom right */}
         <div className="hero-meta hero-reveal">
           <div className="hero-meta-group">
-            <span className="hero-small">{PROFILE.location}</span>
+            <span className="hero-small">{HERO_PROFILE.location}</span>
             <Sphere />
           </div>
         </div>

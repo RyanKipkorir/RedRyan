@@ -9,11 +9,12 @@ import gsap from "gsap";
 /* forked from Blake Bowen's shape overlays: https://codepen.io/osublake/pen/BYwgBg
    Each path is a wave built from POINTS control points that move on their own random delay.
    One wipe = the layers rise from the bottom and cover the screen, `onCovered` runs while
-   nothing can be seen, then the layers keep going up and uncover the page. */
+   nothing can be seen, then the layers keep going up and uncover the page.
+   Calls are queued, so wipes triggered close together play one after the other. */
 const POINTS = 10;
-const POINT_DELAY_MAX = 0.3; // how far apart the points of one wave start
-const PATH_DELAY = 0.25; // gap between one layer and the next
-const DURATION = 0.9; // seconds one point takes
+const POINT_DELAY_MAX = 0.25; // how far apart the points of one wave start
+const PATH_DELAY = 0.18; // gap between one layer and the next
+const DURATION = 0.7; // seconds one point takes
 
 /* colors: back layer first, front layer last (it is the one that ends up on top) */
 const ShapeOverlay = forwardRef(({ colors = ["#ffffff", "#ff0000"] }, ref) => {
@@ -32,7 +33,6 @@ const ShapeOverlay = forwardRef(({ colors = ["#ffffff", "#ff0000"] }, ref) => {
     const all = paths.map(() => Array(POINTS).fill(100));
 
     let opened = true; // true + every point at 100 = nothing visible
-    let busy = false;
     let alive = true;
     let tl;
 
@@ -79,9 +79,8 @@ const ShapeOverlay = forwardRef(({ colors = ["#ffffff", "#ff0000"] }, ref) => {
         });
       });
 
-    api.current.play = async (onCovered) => {
-      if (busy) return;
-      busy = true;
+    const run = async (onCovered) => {
+      if (!alive) return;
       svg.current.style.visibility = "visible";
 
       await sweep(true); // cover
@@ -97,8 +96,11 @@ const ShapeOverlay = forwardRef(({ colors = ["#ffffff", "#ff0000"] }, ref) => {
       all.forEach((pts) => pts.fill(100));
       render();
       svg.current.style.visibility = "hidden";
-      busy = false;
     };
+
+    let chain = Promise.resolve();
+    api.current.play = (onCovered) =>
+      (chain = chain.then(() => run(onCovered)));
 
     render();
 

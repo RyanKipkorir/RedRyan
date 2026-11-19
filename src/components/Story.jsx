@@ -5,33 +5,15 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ShapeOverlay from "./ShapeOverlay";
 import Stan from "./Stan";
 import Counter from "./Counter";
+import {
+  STORY_BAR_COUNT,
+  STORY_FLOW,
+  STORY_STARTED_YEAR,
+  STORY_TOOLS,
+  SECTION_IDS,
+} from "../../constants/index.js";
 
 gsap.registerPlugin(ScrollTrigger);
-
-/* ───────────── edit me ───────────── */
-// GitHub suspended the account on October 30th, 2026 at 18:00 East Africa Time (UTC+3)
-const SUSPENDED_AT = new Date("2026-10-30T18:00:00+03:00");
-
-// ← the year you started building games and websites
-const STARTED_YEAR = 2021;
-
-/* edit freely: this is the tools beat */
-const TOOLS = [
-  { group: "Languages", items: ["JavaScript", "TypeScript", "HTML & CSS"] },
-  {
-    group: "Frameworks",
-    items: [
-      "React",
-      "React Native",
-      "Expo",
-      "Tailwind CSS",
-      "NativeWind",
-      "Vite",
-      "GSAP",
-    ],
-  },
-  { group: "Software", items: ["Git & GitHub", "Vercel", "Hedera"] },
-];
 
 /* an eye: white almond, black pupil clipped to it */
 const EYE = "M4 50Q50 2 96 50Q50 98 4 50Z";
@@ -61,27 +43,87 @@ const EyeArt = () => {
   );
 };
 
-const BARS = 100; // 100 bars x 1dvh = one full screen height
-
 const Story = () => {
   const root = useRef(null);
   const wipe = useRef(null);
   const [showYears, setShowYears] = useState(false);
 
-  const days = Math.max(
-    0,
-    Math.floor((Date.now() - SUSPENDED_AT.getTime()) / 86400000),
-  );
-  const years = Math.max(1, new Date().getFullYear() - STARTED_YEAR);
+  const years = Math.max(1, new Date().getFullYear() - STORY_STARTED_YEAR);
   const yearsSize =
     typeof window !== "undefined" && window.innerWidth < 640 ? 96 : 160;
 
   useLayoutEffect(() => {
     const el = root.current;
-    const first = el.querySelector(".story-solo"); // the opening beat
+    const first = el.querySelector(".story-solo"); // the opening beat: the eyes
     const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
+      /* pins first, in page order, so everything created after them counts their spacing */
+
+      /* the flow: the list scrolls past a pinned stage and each line lights up near the centre */
+      const stage = el.querySelector(".story-flow-stage");
+      const list = stage.querySelector(".story-flow-list");
+      const rows = gsap.utils.toArray("li", list);
+      const travel = () => Math.max(0, list.scrollHeight - stage.offsetHeight);
+
+      const light = () => {
+        const box = stage.getBoundingClientRect();
+        const mid = box.top + box.height / 2;
+        rows.forEach((li) => {
+          const r = li.getBoundingClientRect();
+          const d = Math.min(
+            1,
+            Math.abs(r.top + r.height / 2 - mid) / (box.height * 0.34),
+          );
+          gsap.set(li, { opacity: 0.2 + 0.8 * (1 - d), x: (1 - d) * 28 });
+        });
+      };
+
+      gsap.fromTo(
+        list,
+        { y: 0 },
+        {
+          y: () => -travel(),
+          ease: "none",
+          onUpdate: light,
+          scrollTrigger: {
+            trigger: stage,
+            start: "top top",
+            end: () => "+=" + travel(),
+            pin: true,
+            scrub: 0.6,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onRefresh: light,
+          },
+        },
+      );
+      light();
+
+      /* suspension: red bars sweep across, the red screen gives way to dark */
+      const swap = el.querySelector(".story-swap");
+      const bars = swap.querySelectorAll(".story-bar");
+
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: swap,
+            scrub: 0.5,
+            pin: true,
+            start: "top top",
+            end: "+=150%",
+          },
+        })
+        .to(bars, {
+          force3D: true,
+          duration: 1,
+          xPercent: 100,
+          ease: "power1.inOut",
+          stagger: { amount: 1 },
+        })
+        .to(bars, { ease: "power1.out", duration: 1, rotation: 45 }, 0)
+        .to(bars, { ease: "power1.in", duration: 1, rotation: 0 }, 1);
+
       /* every beat but the first: its lines rise in one after the other */
       el.querySelectorAll("[data-beat]").forEach((beat) => {
         if (beat === first) return;
@@ -114,43 +156,7 @@ const Story = () => {
           }),
       });
 
-      /* days since suspended counts up */
-      const num = el.querySelector("[data-days]");
-      const n = { v: 0 };
-      num.textContent = "0";
-      gsap.to(n, {
-        v: days,
-        duration: 2,
-        ease: "power2.out",
-        onUpdate: () => (num.textContent = Math.round(n.v)),
-        scrollTrigger: { trigger: num, start: "top 80%", once: true },
-      });
-
-      /* suspension -> tools: red bars sweep from the left half to the right half */
-      const swap = el.querySelector(".story-swap");
-      const bars = swap.querySelectorAll(".story-bar");
-
-      gsap
-        .timeline({
-          scrollTrigger: {
-            trigger: swap,
-            scrub: 0.5,
-            pin: true,
-            start: "top top",
-            end: "+=150%",
-          },
-        })
-        .to(bars, {
-          force3D: true,
-          duration: 1,
-          xPercent: 100,
-          ease: "power1.inOut",
-          stagger: { amount: 1 },
-        })
-        .to(bars, { ease: "power1.out", duration: 1, rotation: 45 }, 0)
-        .to(bars, { ease: "power1.in", duration: 1, rotation: 0 }, 1);
-
-      /* years counter: mounts when its half arrives, so its intro is seen */
+      /* years counter: mounts when its block arrives, so its intro is seen */
       ScrollTrigger.create({
         trigger: el.querySelector(".story-years"),
         start: "top 85%",
@@ -197,8 +203,8 @@ const Story = () => {
       return () => window.removeEventListener("mousemove", onMove);
     });
 
-    /* the plus: sits on the centre line and turns 900deg from section 2 to the end
-       (desktop only; the halves are stacked on mobile) */
+    /* the plus: sits at the right edge and turns 900deg from the intro to the end
+       (desktop only) */
     mm.add(
       "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
       () => {
@@ -239,99 +245,104 @@ const Story = () => {
       mm.revert();
       first.classList.replace("tone-red", "tone-dark");
     };
-  }, [days]);
+  }, []);
 
   return (
-    <section id="story" ref={root}>
+    <section id={SECTION_IDS.about} ref={root}>
       <ShapeOverlay ref={wipe} colors={["#000000", "#ff0000"]} />
 
-      {/* the plus: fixed on the centre line while you move through the sections */}
+      {/* the plus: fixed at the right edge while you move through the sections */}
       <div className="story-plus" aria-hidden="true">
         <svg className="story-plus-svg" viewBox="0 0 100 100">
           <path d="M38 4H62V38H96V62H62V96H38V62H4V38H38Z" />
         </svg>
       </div>
 
-      {/* 1 · opening: one full screen, dark until the wipe turns it red */}
+      {/* 1 · the eyes: dark until the wipe turns it red */}
       <div className="story-solo tone-dark" data-beat>
-        <p className="story-kicker story-rise">Hi, I'm Ryan</p>
-        <h2 className="story-big story-rise">A Creative developer</h2>
-        <p className="story-text story-rise">
-          fascinated by , <strong>mathematics</strong> ,{" "}
-          <strong> motion</strong> and <strong>visual storytelling</strong>.
-        </p>
+        <p className="story-kicker story-rise">I know why you’re asking.</p>
         <div className="story-eyes story-rise" aria-hidden="true">
           <EyeArt />
           <EyeArt />
         </div>
+        <figure className="story-quote story-rise">
+          <blockquote>
+            “The important thing is not to stop questioning. Curiosity has its
+            own reason for existence.”
+          </blockquote>
+          <figcaption>— Albert Einstein</figcaption>
+        </figure>
       </div>
 
-      {/* 2 · white | dark */}
-      <div className="story-split" data-beat>
-        <div className="story-half tone-dark">
-          <p className="story-kicker story-rise">
-            A little math. A lot of curiosity.
+      {/* 2 · who */}
+      <div className="story-beat tone-dark" data-beat>
+        <p className="story-kicker story-rise">Hi, I’m Ryan</p>
+        <h2 className="story-big story-rise">A Creative developer</h2>
+        <p className="story-text story-rise story-aside">
+          fascinated by <strong>mathematics</strong>, <strong>motion</strong>{" "}
+          and <strong>visual storytelling</strong>.
+        </p>
+      </div>
+
+      {/* 3 · school */}
+      <div className="story-beat tone-white" data-beat>
+        <p className="story-kicker story-rise">
+          A little math. A lot of curiosity.
+        </p>
+        <h2 className="story-big story-rise">
+          I studied Mathematics and Computer Science
+        </h2>
+        <p className="story-text story-rise story-indent">
+          at The Multimedia University of Kenya
+        </p>
+        <p className="story-text story-rise story-aside">
+          But I’ve always been interested in what happens when abstract{" "}
+          <strong>ideas</strong> become something you can see, touch and
+          interact with.
+        </p>
+      </div>
+
+      {/* 4 · the flow: a pinned stage, the list scrolls past and each line lights up */}
+      <div className="story-flow tone-red" data-beat>
+        <div className="story-flow-stage">
+          <p className="story-kicker story-flow-kicker story-rise">
+            Daily involvements
           </p>
-          <h2 className="story-big story-rise text-white">
-            I studied Mathematics and Computer Science
-          </h2>
-          <p className="story-text story-rise ">
-            at The Multimedia University of Kenya
-          </p>
-        </div>
-        <div className="story-half tone-red">
-          <p className="story-text story-rise">
-            But I've always been interested in what happens when abstract{" "}
-            <strong> ideas </strong>
-            become something you can see, touch and interact with.
-          </p>
+          <h2 className="story-flow-head">I</h2>
+          <ul className="story-flow-list">
+            {STORY_FLOW.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
         </div>
       </div>
 
-      {/* 3 · red | white  (the suspension) */}
-      <div className="story-split" data-beat>
-        <div className="story-half tone-dark">
-          <p className="story-kicker story-rise">SCHOOL</p>
-          <h2 className="story-big story-rise">
-            I studied Mathematics and Computer Science
-          </h2>
-          <p className="story-text story-rise">
-            at The Multimedia University of Kenya
-          </p>
-        </div>
-        <div className="story-half tone-red">
-          <p className="story-kicker story-rise">
-            <span className="story-live" />
-            Days since suspended
-          </p>
-          <p className="story-counter-num story-rise" data-days>
-            {days}
-          </p>
-        </div>
-      </div>
-
-      {/* transition: red bars sweep red|white into dark|red */}
+      {/* transition: red bars sweep across, red gives way to dark */}
       <div className="story-swap">
-        <span className="story-swap-label is-left">Suspended.</span>
-        <span className="story-swap-label is-right">Still building.</span>
-        {Array.from({ length: BARS }, (_, i) => (
+        <span className="story-swap-label is-a">However I was.</span>
+        <span className="story-swap-label is-b">Suspended from GitHub.</span>
+        {Array.from({ length: STORY_BAR_COUNT }, (_, i) => (
           <i key={i} className="story-bar" aria-hidden="true" />
         ))}
       </div>
 
-      {/* 4 · dark | red  (the toolbox) */}
-      <div className="story-split" data-beat>
-        <div className="story-half tone-dark">
-          <p className="story-kicker story-rise text-white">
-            History has a sense of humour
+      {/* 5 · Stańczyk */}
+      <div className="story-beat story-beat--stan tone-dark" data-beat>
+        <h2 className="story-big story-rise">History has a sense of humour</h2>
+        <Stan className="story-rise" />
+      </div>
+
+      {/* 6 · the toolbox */}
+      <div className="story-beat story-beat--tools tone-white" data-beat>
+        <div className="story-tools-lead">
+          <p className="story-kicker story-rise">The toolbox</p>
+          <h2 className="story-big story-rise">What I build with.</h2>
+          <p className="story-text story-rise">
+            Languages, frameworks and the software I use every day.
           </p>
 
-          <Stan className="story-rise" />
-        </div>
-
-        <div className="story-half tone-red">
           <div className="story-years story-rise">
-            <p className="story-kicker">Years of experience</p>
+            <p className="story-kicker">I have been building for about</p>
             <div className="story-years-row">
               <div className="story-years-num" aria-label={`${years} years`}>
                 {showYears && (
@@ -354,25 +365,25 @@ const Story = () => {
                 )}
               </div>
               <p className="story-years-label">
-                building games
+                years of
                 <br />
-                and websites
+                games and websites
               </p>
             </div>
           </div>
+        </div>
 
-          <div className="story-tools">
-            {TOOLS.map(({ group, items }) => (
-              <div key={group} className="story-tools-group story-rise">
-                <h3>{group}</h3>
-                <ul>
-                  {items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+        <div className="story-tools">
+          {STORY_TOOLS.map(({ group, items }) => (
+            <div key={group} className="story-tools-group story-rise">
+              <h3>{group}</h3>
+              <ul>
+                {items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     </section>

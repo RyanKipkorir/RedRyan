@@ -58,7 +58,13 @@ html.is-locked {
   @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   One block per section, in page order:
+   SHARED · #nav · #menu · #hero · #story (+ stan) ·
+   #work (+ finale + skills ring) · #contact · #footer
+   ───────────────────────────────────────────────────────────── */
 @layer components {
+  /* ═════════════════════════ SHARED ═════════════════════════ */
   main {
     @apply w-full overflow-x-hidden;
   }
@@ -431,7 +437,8 @@ html.is-locked {
     }
   }
 
-  /* ═════════════════════════ STORY ═════════════════════════ */
+  /* ═════════════════════════ STORY (includes the Stan card) ═════════════════════════ */
+  /* ═════════════════════════ STORY (includes the Stan card) ═════════════════════════ */
   #story {
     @apply relative z-0 w-full;
 
@@ -464,30 +471,59 @@ html.is-locked {
       }
     }
 
-    /* ---------- beat 1: one full screen ---------- */
+    /* ---------- beat 1: just the eyes and the quote ---------- */
     .story-solo {
-      @apply flex min-h-dvh flex-col items-center justify-center gap-6 px-5 py-24 text-center lg:px-[6vw];
+      @apply flex min-h-dvh flex-col items-center justify-center gap-8 px-5 py-24 text-center lg:px-[6vw];
 
-      .story-big {
-        font-size: clamp(2.25rem, 7vw, 8.5rem);
+      .story-eyes {
+        @apply gap-4 md:gap-8;
+      }
+
+      .story-eye-svg {
+        width: clamp(8rem, 22vw, 20rem);
       }
     }
 
-    /* ---------- every other beat: two equal halves, mirrored about the centre line ---------- */
-    .story-split {
-      @apply grid min-h-dvh grid-cols-1 lg:grid-cols-2;
+    .story-quote {
+      @apply flex max-w-[34em] flex-col gap-3;
+
+      blockquote {
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-size: clamp(1.4rem, 2.8vw, 2.8rem);
+        line-height: 1.15;
+        text-wrap: balance;
+      }
+
+      figcaption {
+        @apply font-mono text-xs font-bold tracking-widest uppercase opacity-70 md:text-sm;
+      }
     }
 
-    .story-half {
-      @apply flex min-h-[60dvh] flex-col justify-center gap-6 px-5 py-24 lg:min-h-dvh lg:px-[6vw];
+    /* ---------- the storyline: no halves, content sits off-centre and alternates ---------- */
+    .story-beat {
+      @apply relative flex min-h-dvh flex-col justify-center gap-6 px-5 py-28 lg:pr-[14vw] lg:pl-[6vw];
+    }
 
-      &:first-child {
-        @apply lg:items-end lg:text-right;
-      }
+    /* pushed to the right of the column / stepped in from the left */
+    .story-aside {
+      @apply lg:ml-auto;
+    }
 
-      &:last-child {
-        @apply lg:items-start lg:text-left;
-      }
+    .story-indent {
+      @apply lg:ml-[8vw];
+    }
+
+    .story-beat--stan .stan {
+      @apply lg:w-[min(56%,36rem)] lg:self-end;
+    }
+
+    .story-beat--tools {
+      @apply lg:grid lg:grid-cols-[1.35fr_1fr] lg:content-center lg:items-start lg:gap-x-[6vw];
+    }
+
+    .story-tools-lead {
+      @apply flex flex-col gap-6;
     }
 
     /* ---------- type ---------- */
@@ -514,85 +550,61 @@ html.is-locked {
       max-width: 26em;
     }
 
-    /* ---------- days since suspended ---------- */
-    .story-counter-num {
-      @apply font-mono font-bold;
-      font-size: clamp(5rem, 16vw, 15rem);
-      line-height: 0.85;
-      letter-spacing: -0.06em;
-      color: var(--color-red);
-    }
-
-    /* blinking red dot before the label */
+    /* blinking red dot before a label (used by Stan) */
     .story-live {
       @apply mr-2 inline-block size-2 rounded-full bg-red align-middle;
       animation: story-pulse 1.4s ease-in-out infinite;
     }
 
-    /* ---------- tools ---------- */
-    .story-tools {
-      @apply flex flex-col gap-8;
+    /* ---------- the flow: a pinned stage, the list scrolls past and each line lights up ---------- */
+    .story-flow-stage {
+      @apply relative flex min-h-dvh items-center gap-6 px-5 py-28 lg:pr-[14vw] lg:pl-[6vw];
     }
 
-    .story-tools-group {
-      @apply flex flex-col gap-3;
-
-      h3 {
-        @apply font-mono text-xs font-bold tracking-widest uppercase md:text-sm;
-      }
-
-      ul {
-        @apply flex list-none flex-wrap gap-2;
-      }
-
-      li {
-        @apply cursor-default rounded-full border-2 border-dark px-4 py-1.5 font-mono text-sm font-bold transition-colors duration-300;
-
-        &:hover {
-          @apply bg-dark text-red;
-        }
-      }
+    .story-flow-kicker {
+      @apply absolute top-24 left-5 lg:left-[6vw];
     }
 
-    /* ---------- transition: red bars carry the left half over to the right ---------- */
-    .story-swap {
-      @apply relative h-dvh w-full overflow-hidden;
-      /* what the bars uncover on the left, and what they cover on the right */
-      background: linear-gradient(90deg, var(--color-dark) 50%, #fff 50%);
+    .story-flow-head {
+      @apply flex-none font-mono font-bold text-white select-none;
+      font-size: clamp(4.5rem, 16vw, 15rem);
+      line-height: 0.8;
+      letter-spacing: -0.06em;
     }
 
-    .story-bar {
-      @apply block w-1/2 will-change-transform;
-      height: 1.2dvh;
-      margin-bottom: -0.2dvh;
-      background: var(--color-red);
-    }
-
-    /* each label is the colour of the half behind it, so it shows only on the bars */
-    .story-swap-label {
-      @apply absolute top-1/2 z-[2] w-1/2 -translate-y-1/2 px-4 text-center font-mono font-bold uppercase;
-      font-size: clamp(1.6rem, 4.6vw, 4.5rem);
-      line-height: 1;
+    .story-flow-list {
+      @apply m-0 flex list-none flex-col p-0;
+      gap: 0.35em;
+      font-family: var(--font-effect);
+      font-weight: 700;
+      font-size: clamp(1.6rem, 4.2vw, 4.75rem);
+      line-height: 1.02;
       letter-spacing: -0.04em;
 
-      &.is-left {
-        @apply left-0;
-        color: var(--color-dark);
-      }
-
-      &.is-right {
-        @apply right-0 text-white;
+      li {
+        will-change: transform, opacity;
       }
     }
-    /* ---------- two eyes above "make people stop, and look twice" ---------- */
-    .story-eyes {
-      @apply flex gap-3 md:gap-5 justify-center;
-    }
 
-    .story-eye-svg {
-      width: clamp(4rem, 10vw, 9rem);
-      height: auto;
-      overflow: visible;
+    /* motion on: the stage is one pinned screen and the list slides inside it */
+    @media (prefers-reduced-motion: no-preference) {
+      .story-flow-stage {
+        @apply h-dvh min-h-0 overflow-hidden py-0;
+      }
+
+      .story-flow-head {
+        @apply absolute top-1/2 left-5 -translate-y-1/2 lg:left-[6vw];
+      }
+
+      .story-flow-list {
+        @apply absolute top-0 right-5 lg:right-[14vw];
+        left: clamp(6rem, 22vw, 24rem);
+        padding-block: 46dvh;
+
+        li {
+          opacity: 0.2;
+        }
+      }
     }
 
     /* ---------- years of experience ---------- */
@@ -615,15 +627,80 @@ html.is-locked {
       @apply pb-3 font-mono text-xs font-bold uppercase md:text-sm;
     }
 
-    /* ---------- the plus on the centre line (desktop, motion only) ---------- */
+    /* ---------- tools ---------- */
+    .story-tools {
+      @apply flex flex-col gap-8 lg:mt-32;
+    }
+
+    .story-tools-group {
+      @apply flex flex-col gap-3;
+
+      h3 {
+        @apply font-mono text-xs font-bold tracking-widest uppercase md:text-sm;
+      }
+
+      ul {
+        @apply flex list-none flex-wrap gap-2;
+      }
+
+      li {
+        @apply cursor-default rounded-full border-2 border-dark px-4 py-1.5 font-mono text-sm font-bold transition-colors duration-300;
+
+        &:hover {
+          @apply bg-dark text-red;
+        }
+      }
+    }
+
+    /* ---------- transition: red bars sweep across, red gives way to dark ---------- */
+    .story-swap {
+      @apply relative h-dvh w-full overflow-hidden bg-dark;
+    }
+
+    .story-bar {
+      @apply block w-full will-change-transform;
+      height: 1.2dvh;
+      margin-bottom: -0.2dvh;
+      background: var(--color-red);
+    }
+
+    /* both labels sit in the same spot, each the colour of the other side,
+       so "However I was." shows on the red bars and the next line shows on the dark */
+    .story-swap-label {
+      @apply pointer-events-none absolute inset-0 z-[2] grid place-items-center px-6 text-center font-mono font-bold uppercase;
+      font-size: clamp(2rem, 7vw, 7rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+
+      &.is-a {
+        color: var(--color-dark);
+      }
+
+      &.is-b {
+        color: var(--color-red);
+      }
+    }
+
+    /* ---------- the eyes ---------- */
+    .story-eyes {
+      @apply flex justify-center gap-3 md:gap-5;
+    }
+
+    .story-eye-svg {
+      width: clamp(4rem, 10vw, 9rem);
+      height: auto;
+      overflow: visible;
+    }
+
+    /* ---------- the plus at the right edge (desktop, motion only) ---------- */
     .story-plus {
       position: fixed;
       top: 50%;
-      left: 50%;
+      right: clamp(1rem, 3vw, 3rem);
       z-index: 30;
-      width: clamp(3.5rem, 7vw, 6.5rem);
+      width: clamp(2.5rem, 4.5vw, 4.5rem);
       aspect-ratio: 1;
-      translate: -50% -50%;
+      translate: 0 -50%;
       pointer-events: none;
       opacity: 0;
       visibility: hidden;
@@ -644,71 +721,72 @@ html.is-locked {
         stroke-linejoin: round;
       }
     }
-  }
-  /* ═════════════════════════ STAN (card: painting ⇄ days suspended) ═════════════════════════ */
-  .stan {
-    @apply flex w-full flex-col items-center gap-4 self-center text-center;
-  }
 
-  .stan-img {
-    @apply block size-full object-cover;
-    /* the painting is landscape: this keeps Stańczyk in the square crop */
-    object-position: 28% 50%;
-  }
+    /* ---------- STAN: flip card, painting ⇄ days suspended ---------- */
+    .stan {
+      @apply flex w-full flex-col items-center gap-4 self-center text-center;
+    }
 
-  .stan-title {
-    @apply text-white text-lg font-vietnam;
-  }
+    .stan-img {
+      @apply block size-full object-cover;
+      /* the painting is landscape: this keeps Stańczyk in the square crop */
+      object-position: 28% 50%;
+    }
 
-  .stan-hint {
-    @apply font-mono text-[11px] tracking-widest text-white/60 uppercase;
-  }
+    .stan-title {
+      @apply font-vietnam text-lg text-white;
+    }
 
-  /* back of the card: red border, live counter */
-  .stan-back {
-    @apply flex size-full flex-col items-center justify-center gap-3 p-4 text-center text-red;
-    border: 3px solid var(--color-red);
-    border-radius: 19px;
-    background: var(--color-dark);
-  }
+    .stan-hint {
+      @apply font-mono text-[11px] tracking-widest text-white/60 uppercase;
+    }
 
-  .stan-tag {
-    @apply font-mono text-[11px] font-bold tracking-widest uppercase;
-  }
+    /* back of the card: red border, live counter */
+    .stan-back {
+      @apply flex size-full flex-col items-center justify-center gap-3 p-4 text-center text-red;
+      border: 3px solid var(--color-red);
+      border-radius: 19px;
+      background: var(--color-dark);
+    }
 
-  .stan-num {
-    @apply flex min-h-28 items-center justify-center;
-    font-family: var(--font-effect);
-    letter-spacing: -0.04em;
-    line-height: 1;
-  }
+    .stan-tag {
+      @apply font-mono text-[11px] font-bold tracking-widest uppercase;
+    }
 
-  .stan-since {
-    @apply font-mono text-[10px] opacity-70;
-  }
+    .stan-num {
+      @apply flex min-h-28 items-center justify-center;
+      font-family: var(--font-effect);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
 
-  /* bottom right: the sentence + the painter's credit */
-  .stan-credit {
-    @apply mt-6 max-w-[36ch] self-end text-right font-mono text-xs leading-relaxed text-red;
+    .stan-since {
+      @apply font-mono text-[10px] opacity-70;
+    }
 
-    a {
-      @apply underline decoration-1 underline-offset-4 transition-colors duration-300;
+    /* bottom right: the sentence + the painter's credit */
+    .stan-credit {
+      @apply mt-6 max-w-[36ch] self-end text-right font-mono text-xs leading-relaxed text-red;
 
-      &:hover {
-        @apply text-white;
+      a {
+        @apply underline decoration-1 underline-offset-4 transition-colors duration-300;
+
+        &:hover {
+          @apply text-white;
+        }
+      }
+
+      small {
+        @apply mt-2 block text-[10px] opacity-70;
       }
     }
 
-    small {
-      @apply mt-2 block text-[10px] opacity-70;
+    .stan-scramble {
+      @apply font-bold text-red;
     }
   }
 
-  .stan-scramble {
-    @apply font-bold text-red;
-  }
-
-  /* ═════════════════════════ WORK / PROJECTS ═════════════════════════ */
+  /* ═════════════════════════ WORK / PROJECTS (includes the finale + skills ring) ═════════════════════════ */
   #work {
     @apply relative z-0 w-full bg-red text-dark;
 
@@ -960,6 +1038,12 @@ html.is-locked {
         @apply flex-col items-start justify-center gap-4;
       }
 
+      /* the finale is the last panel: copy on the left, skills ring on the right
+         (after the outro rule above, so it wins) */
+      .fin {
+        @apply flex-row items-center justify-between;
+      }
+
       .proj-text {
         @apply w-[min(26vw,26rem)] flex-none;
       }
@@ -980,6 +1064,179 @@ html.is-locked {
       .work-progress {
         @apply block;
       }
+    }
+
+    /* ---------- FINALE: sliding color bands + outlined words (the "panels" effect) ---------- */
+    .fin {
+      @apply relative isolate overflow-hidden text-white;
+    }
+
+    .fin-bands {
+      @apply absolute inset-y-0 left-0 -z-10 flex w-[400%];
+      --posv: 0;
+    }
+
+    .fin-band {
+      @apply relative h-full flex-1 bg-dark;
+      /* earlier bands sit above later ones, so their streaks stay visible */
+      z-index: calc(9 - var(--i));
+
+      &:nth-child(2n) {
+        @apply bg-red;
+      }
+
+      /* the streak that trails the motion, in the next band's color */
+      &::after {
+        content: "";
+        @apply absolute inset-y-0 left-full w-full origin-left bg-red;
+        transform: scaleX(var(--posv));
+      }
+
+      &:nth-child(2n)::after {
+        @apply bg-dark;
+      }
+    }
+
+    .fin-copy {
+      @apply relative z-10 flex flex-col items-start gap-5;
+    }
+
+    .fin-title {
+      @apply flex flex-wrap;
+      column-gap: 0.22em;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(3.5rem, 11vmin, 10rem);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      max-width: 9em;
+    }
+
+    /* the real text only holds the space; the outlined copy slides up over it */
+    .fin-word {
+      @apply relative inline-block overflow-hidden text-transparent;
+      padding: 0.04em 0.14em;
+      margin: -0.04em 0;
+
+      &::before {
+        content: attr(data-word);
+        @apply absolute top-1/2 left-1/2 whitespace-nowrap;
+        transform: translate(-50%, -50%);
+        -webkit-text-stroke: 2px #fff;
+        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
+        background-image: linear-gradient(to top, #fff 50%, transparent 50%);
+        background-size: 100% 200%;
+        background-position: 0 100%;
+        transition:
+          transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1)
+            calc(var(--i) * 0.15s + 0.2s),
+          background-position 1s cubic-bezier(0.645, 0.045, 0.355, 1)
+            calc(var(--i) * 0.15s + 0.7s);
+      }
+    }
+
+    /* motion on: words wait below their line and the skills wait at scale 0
+       until the finale becomes active */
+    &.fin-armed .fin:not(.active) .fin-word::before {
+      transform: translate(-50%, 175%);
+      background-position: 0 0;
+      transition-duration: 0.4s;
+      transition-delay: 0s;
+    }
+
+    &.fin-armed .fin:not(.active) .skills-badge {
+      transform: scale(0);
+      transition-duration: 0.3s;
+      transition-delay: 0s;
+    }
+
+    /* ---------- SKILLS RING (Skills.jsx) ---------- */
+    .skills {
+      --ring: min(64vmin, 34rem);
+      --item: calc(var(--ring) * 0.2);
+      @apply relative flex-none;
+      width: var(--ring);
+      height: var(--ring);
+    }
+
+    .skills-ring {
+      @apply absolute inset-0 cursor-grab select-none;
+
+      &:active {
+        @apply cursor-grabbing;
+      }
+    }
+
+    .skills-path {
+      @apply pointer-events-none size-full overflow-visible;
+
+      circle {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 2;
+        stroke-dasharray: 2 10;
+        stroke-linecap: round;
+        vector-effect: non-scaling-stroke;
+      }
+    }
+
+    /* each logo sits on the circle at --a; the last rotate cancels the ring's spin so it stays upright */
+    .skills-item {
+      @apply absolute top-1/2 left-1/2;
+      width: var(--item);
+      height: var(--item);
+      margin: calc(var(--item) / -2) 0 0 calc(var(--item) / -2);
+      transform: rotate(var(--a)) translateY(calc(var(--ring) / -2))
+        rotate(calc(var(--a) * -1 - var(--spin, 0deg)));
+    }
+
+    .skills-badge {
+      @apply size-full;
+      transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1)
+        calc(var(--i, 0) * 0.1s + 0.8s);
+    }
+
+    .skills-face {
+      @apply relative grid size-full place-items-center rounded-full bg-white p-[18%] text-dark;
+      transition:
+        transform 0.35s ease,
+        box-shadow 0.35s ease;
+
+      img {
+        @apply pointer-events-none relative z-10 size-full object-contain;
+      }
+    }
+
+    /* shows until the logo file exists */
+    .skills-fallback {
+      @apply absolute inset-0 grid place-items-center font-mono text-[10px] font-bold;
+    }
+
+    /* the logo at the top of the ring */
+    .skills-item.is-active .skills-face {
+      transform: scale(1.22);
+      box-shadow:
+        0 0 0 3px var(--color-red),
+        0 0 0 7px #fff;
+    }
+
+    .skills-center {
+      @apply pointer-events-none absolute inset-0 grid place-content-center gap-2 text-center;
+    }
+
+    .skills-name {
+      @apply text-white;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(1.75rem, 3.4vw, 3.25rem);
+      line-height: 1;
+    }
+
+    .skills-hint {
+      @apply font-mono text-[11px] tracking-widest text-white/70 uppercase;
     }
   }
 
@@ -1088,7 +1345,7 @@ html.is-locked {
 
     /* ---------- plus cube: spins, splits into four social tiles ---------- */
     .contact-foot {
-      @apply flex items-center justify-between gap-4 mt-10 mb-16;
+      @apply mt-10 mb-16 flex justify-center gap-4;
     }
 
     .contact-find {
@@ -1202,7 +1459,7 @@ html.is-locked {
     }
 
     .footer-quote {
-      @apply flex flex-col gap-3 text-white font-vietnam;
+      @apply flex flex-col gap-3 font-vietnam text-white;
 
       p {
         font-family: var(--font-serif);
@@ -1222,6 +1479,7 @@ html.is-locked {
   }
 }
 
+/* ═════════════════════════ KEYFRAMES ═════════════════════════ */
 @keyframes hero-blink {
   50% {
     opacity: 0;
