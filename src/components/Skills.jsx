@@ -10,13 +10,13 @@ gsap.registerPlugin(Draggable, InertiaPlugin, useGSAP);
    drop the logos in /public/images/skills/ (svg or png).
    Until a file exists, the label shows instead.                                */
 const SKILLS = [
-  { id: "unity", label: "Unity", src: "/images/skills/unity.svg" },
-  { id: "js", label: "JavaScript", src: "/images/skills/js.svg" },
-  { id: "r", label: "R", src: "/images/skills/r.svg" },
-  { id: "react", label: "React", src: "/images/skills/react.svg" },
-  { id: "csharp", label: "C#", src: "/images/skills/csharp.svg" },
-  { id: "figma", label: "Figma", src: "/images/skills/figma.svg" },
-  { id: "nextjs", label: "Next.js", src: "/images/skills/nextjs.svg" },
+  { id: "unity", label: "Unity", src: "/images/skills/unity.png" },
+  { id: "js", label: "JavaScript", src: "/images/skills/js.png" },
+  { id: "rstudio", label: "R", src: "/images/skills/rstudio.png" },
+  { id: "react", label: "React", src: "/images/skills/react.png" },
+  { id: "csharp", label: "C#", src: "/images/skills/c#.png" },
+  { id: "figma", label: "Figma", src: "/images/skills/figma.png" },
+  { id: "nextjs", label: "Next.js", src: "/images/skills/nextjs.png" },
 ];
 
 const STEP = 360 / SKILLS.length;

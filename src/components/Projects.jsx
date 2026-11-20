@@ -2,6 +2,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { whenReady } from "./stories/storyUtils.js";
 import {
   GITHUB,
   PROJECT_BAND_COUNT,
@@ -10,7 +11,6 @@ import {
   PROJECTS,
   SECTION_IDS,
 } from "../../constants/index.js";
-import Skills from "./Skills";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -87,184 +87,189 @@ const Projects = () => {
   const track = useRef(null);
 
   const { contextSafe } = useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-      const el = root.current;
-      const finale = el.querySelector(".fin");
-      const bands = el.querySelector(".fin-bands");
+    (context) => {
+      const cancel = whenReady(() =>
+        context.add(() => {
+          const mm = gsap.matchMedia();
+          const el = root.current;
+          const finale = el.querySelector(".fin");
+          const bands = el.querySelector(".fin-bands");
 
-      /* finale effect: the bands skew with scroll velocity and trail a streak of the next color */
-      gsap.set(bands, { "--posv": 0 });
-      const skewTo = gsap.quickTo(bands, "skewX", {
-        duration: 0.5,
-        ease: "power3",
-      });
-      const streakTo = gsap.quickTo(bands, "--posv", {
-        duration: 0.5,
-        ease: "power3",
-      });
-
-      const onVelocity = (self) => {
-        const v = self.getVelocity() / 1400;
-        skewTo(gsap.utils.clamp(-18, 18, v * 5));
-        streakTo(gsap.utils.clamp(0, 1, Math.abs(v) / 1.7));
-      };
-      const settle = () => {
-        skewTo(0);
-        streakTo(0);
-      };
-
-      /* desktop: pinned horizontal scroll (CodePen pattern) */
-      mm.add(
-        "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
-        () => {
-          const distance = () =>
-            Math.max(0, track.current.scrollWidth - window.innerWidth);
-
-          const slide = gsap.to(track.current, {
-            x: () => -distance(),
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              start: "top top",
-              end: () => "+=" + distance(),
-              pin: pin.current,
-              scrub: 1,
-              anticipatePin: 1,
-              invalidateOnRefresh: true,
-              onUpdate: (self) => {
-                gsap.set(".work-progress-bar", { scaleX: self.progress });
-                onVelocity(self);
-              },
-              onScrubComplete: settle,
-            },
+          /* finale effect: the bands skew with scroll velocity and trail a streak of the next color */
+          gsap.set(bands, { "--posv": 0 });
+          const skewTo = gsap.quickTo(bands, "skewX", {
+            duration: 0.5,
+            ease: "power3",
+          });
+          const streakTo = gsap.quickTo(bands, "--posv", {
+            duration: 0.5,
+            ease: "power3",
           });
 
-          el.querySelectorAll(".work-panel").forEach((panel) => {
-            const intro = panel.classList.contains("work-panel--intro");
-            const mock = panel.querySelector(".proj-mock");
+          const onVelocity = (self) => {
+            const v = self.getVelocity() / 1400;
+            skewTo(gsap.utils.clamp(-18, 18, v * 5));
+            streakTo(gsap.utils.clamp(0, 1, Math.abs(v) / 1.7));
+          };
+          const settle = () => {
+            skewTo(0);
+            streakTo(0);
+          };
 
-            /* text reveals as each panel slides in */
-            gsap.from(panel.querySelectorAll(".proj-reveal"), {
-              y: 60,
-              opacity: 0,
-              duration: 1.1,
-              stagger: 0.08,
-              ease: "power3.out",
-              scrollTrigger: intro
-                ? {
-                    trigger: el,
-                    start: "top 60%",
-                    toggleActions: "play none none reverse",
-                  }
-                : {
-                    trigger: panel,
-                    containerAnimation: slide,
-                    start: "left 80%",
-                    toggleActions: "play none none reverse",
+          /* desktop: pinned horizontal scroll (CodePen pattern) */
+          mm.add(
+            "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
+            () => {
+              const distance = () =>
+                Math.max(0, track.current.scrollWidth - window.innerWidth);
+
+              const slide = gsap.to(track.current, {
+                x: () => -distance(),
+                ease: "none",
+                scrollTrigger: {
+                  trigger: el,
+                  start: "top top",
+                  end: () => "+=" + distance(),
+                  pin: pin.current,
+                  scrub: 1,
+                  anticipatePin: 1,
+                  invalidateOnRefresh: true,
+                  onUpdate: (self) => {
+                    gsap.set(".work-progress-bar", { scaleX: self.progress });
+                    onVelocity(self);
                   },
-            });
+                  onScrubComplete: settle,
+                },
+              });
 
-            /* mockup drifts against the scroll (parallax) */
-            if (mock) {
+              el.querySelectorAll(".work-panel").forEach((panel) => {
+                const intro = panel.classList.contains("work-panel--intro");
+                const mock = panel.querySelector(".proj-mock");
+
+                /* text reveals as each panel slides in */
+                gsap.from(panel.querySelectorAll(".proj-reveal"), {
+                  y: 60,
+                  opacity: 0,
+                  duration: 1.1,
+                  stagger: 0.08,
+                  ease: "power3.out",
+                  scrollTrigger: intro
+                    ? {
+                        trigger: el,
+                        start: "top top",
+                        toggleActions: "play none none reverse",
+                      }
+                    : {
+                        trigger: panel,
+                        containerAnimation: slide,
+                        start: "left 80%",
+                        toggleActions: "play none none reverse",
+                      },
+                });
+
+                /* mockup drifts against the scroll (parallax) */
+                if (mock) {
+                  gsap.fromTo(
+                    mock,
+                    { xPercent: 8 },
+                    {
+                      xPercent: -8,
+                      ease: "none",
+                      scrollTrigger: {
+                        trigger: panel,
+                        containerAnimation: slide,
+                        start: "left right",
+                        end: "right left",
+                        scrub: true,
+                      },
+                    },
+                  );
+                }
+              });
+
+              /* the finale: bands slide in as the last panel arrives, words play when it's active */
               gsap.fromTo(
-                mock,
-                { xPercent: 8 },
+                bands,
+                { xPercent: 0 },
                 {
-                  xPercent: -8,
+                  xPercent: -50,
                   ease: "none",
                   scrollTrigger: {
-                    trigger: panel,
+                    trigger: finale,
                     containerAnimation: slide,
                     start: "left right",
-                    end: "right left",
+                    end: "left left",
                     scrub: true,
                   },
                 },
               );
-            }
-          });
 
-          /* the finale: bands slide in as the last panel arrives, words and skills play when it's active */
-          gsap.fromTo(
-            bands,
-            { xPercent: 0 },
-            {
-              xPercent: -50,
-              ease: "none",
-              scrollTrigger: {
+              ScrollTrigger.create({
                 trigger: finale,
                 containerAnimation: slide,
-                start: "left right",
-                end: "left left",
-                scrub: true,
-              },
+                start: "left 60%",
+                toggleClass: { targets: finale, className: "active" },
+              });
+
+              el.classList.add("fin-armed");
+              return () => {
+                el.classList.remove("fin-armed");
+                settle();
+              };
             },
           );
 
-          ScrollTrigger.create({
-            trigger: finale,
-            containerAnimation: slide,
-            start: "left 60%",
-            toggleClass: { targets: finale, className: "active" },
-          });
+          /* mobile: normal scroll, simple reveals */
+          mm.add(
+            "(max-width: 1023px) and (prefers-reduced-motion: no-preference)",
+            () => {
+              el.querySelectorAll(".work-panel").forEach((panel) => {
+                gsap.from(panel.querySelectorAll(".proj-reveal"), {
+                  y: 40,
+                  opacity: 0,
+                  duration: 1,
+                  stagger: 0.08,
+                  ease: "power3.out",
+                  scrollTrigger: { trigger: panel, start: "top top" },
+                });
+              });
 
-          el.classList.add("fin-armed");
-          return () => {
-            el.classList.remove("fin-armed");
-            settle();
-          };
-        },
-      );
+              gsap.fromTo(
+                bands,
+                { xPercent: 0 },
+                {
+                  xPercent: -50,
+                  ease: "none",
+                  scrollTrigger: {
+                    trigger: finale,
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: true,
+                    onUpdate: onVelocity,
+                    onLeave: settle,
+                    onLeaveBack: settle,
+                  },
+                },
+              );
 
-      /* mobile: normal scroll, simple reveals */
-      mm.add(
-        "(max-width: 1023px) and (prefers-reduced-motion: no-preference)",
-        () => {
-          el.querySelectorAll(".work-panel").forEach((panel) => {
-            gsap.from(panel.querySelectorAll(".proj-reveal"), {
-              y: 40,
-              opacity: 0,
-              duration: 1,
-              stagger: 0.08,
-              ease: "power3.out",
-              scrollTrigger: { trigger: panel, start: "top 80%" },
-            });
-          });
-
-          gsap.fromTo(
-            bands,
-            { xPercent: 0 },
-            {
-              xPercent: -50,
-              ease: "none",
-              scrollTrigger: {
+              ScrollTrigger.create({
                 trigger: finale,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true,
-                onUpdate: onVelocity,
-                onLeave: settle,
-                onLeaveBack: settle,
-              },
+                start: "top 70%",
+                toggleClass: { targets: finale, className: "active" },
+              });
+
+              el.classList.add("fin-armed");
+              return () => {
+                el.classList.remove("fin-armed");
+                settle();
+              };
             },
           );
 
-          ScrollTrigger.create({
-            trigger: finale,
-            start: "top 70%",
-            toggleClass: { targets: finale, className: "active" },
-          });
-
-          el.classList.add("fin-armed");
-          return () => {
-            el.classList.remove("fin-armed");
-            settle();
-          };
-        },
+          ScrollTrigger.refresh();
+        }),
       );
-
-      document.fonts?.ready.then(() => ScrollTrigger.refresh());
+      return () => cancel();
     },
     { scope: root },
   );
@@ -388,7 +393,7 @@ const Projects = () => {
             </article>
           ))}
 
-          {/* finale: sliding color bands + outlined words, with the skills ring */}
+          {/* finale: sliding color bands + outlined words */}
           <div className="work-panel work-panel--outro fin">
             <div className="fin-bands" aria-hidden="true">
               {Array.from({ length: PROJECT_BAND_COUNT }, (_, i) => (
@@ -423,8 +428,6 @@ const Projects = () => {
                 More on GitHub <span aria-hidden="true">↗</span>
               </a>
             </div>
-
-            <Skills className="proj-reveal" />
           </div>
         </div>
 

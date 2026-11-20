@@ -55,11 +55,11 @@ const HERO_ACTIONS = [
   { label: "My work", href: `#${SECTION_IDS.projects}`, tone: "red" },
   { label: "Who is Red?", href: `#${SECTION_IDS.about}`, tone: "white" },
 ];
-const HERO_RED_LETTERS = ["R", "E", "D"];
-const HERO_RYAN_LETTERS = ["R", "Y", "A", "N"];
+const HERO_RED_LETTERS = ["H", "E", "L", "L", "0"];
+const HERO_RYAN_LETTERS = ["W", "0", "R", "L", "D"];
 const HERO_SCRAMBLE_CHARS = "01<>/\\{}[]=+*#%&?ΣπΔ∫";
 
-const STORY_STARTED_YEAR = 2021;
+const STORY_STARTED_YEAR = 2022;
 const STORY_FLOW = [
   "make games on Unity.",
   "animate websites.",

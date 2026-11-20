@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CONTACT_SOCIALS } from "../../constants";
+import { whenReady } from "./stories/storyUtils";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,60 +20,65 @@ const Contact = () => {
   );
 
   useLayoutEffect(() => {
-    const tiles = [...scene.current.querySelectorAll(".contact-tile")];
-    const b = ball.current;
+    let mm;
+    const cancel = whenReady(() => {
+      const tiles = [...scene.current.querySelectorAll(".contact-tile")];
+      const b = ball.current;
 
-    // distance the ball rolls before it touches the first domino
-    const dist = () => tiles[0].offsetLeft - b.offsetWidth;
-    // rolling without slipping: angle = distance / radius
-    const roll = () => (dist() / (b.offsetWidth / 2)) * (180 / Math.PI);
+      // distance the ball rolls before it touches the first domino
+      const dist = () => tiles[0].offsetLeft - b.offsetWidth;
+      // rolling without slipping: angle = distance / radius
+      const roll = () => (dist() / (b.offsetWidth / 2)) * (180 / Math.PI);
 
-    gsap.set(tiles, { transformOrigin: "100% 100%" }); // pivot on the bottom-right edge
+      gsap.set(tiles, { transformOrigin: "100% 100%" }); // pivot on the bottom-right edge
 
-    const mm = gsap.matchMedia();
+      mm = gsap.matchMedia();
 
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const tl = gsap.timeline({
-        defaults: { ease: "none" },
-        scrollTrigger: {
-          trigger: root.current,
-          start: "top top",
-          end: "+=150%",
-          pin: true,
-          scrub: 0.6,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        },
-      });
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const tl = gsap.timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top top",
+            end: "+=150%",
+            pin: true,
+            scrub: 0.6,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
 
-      // 1. the red ball rolls in
-      tl.fromTo(
-        b,
-        { x: 0, rotation: 0 },
-        { x: dist, rotation: roll, duration: 4 },
-        0,
-      );
-
-      // 2. it clips the first domino, which sets off the chain
-      tiles.forEach((tile, i) => {
-        tl.to(
-          tile,
-          { rotation: TOPPLE, duration: 0.7, ease: "power2.in" },
-          3.9 + i * 0.35,
+        // 1. the red ball rolls in
+        tl.fromTo(
+          b,
+          { x: 0, rotation: 0 },
+          { x: dist, rotation: roll, duration: 4 },
+          0,
         );
+
+        // 2. it clips the first domino, which sets off the chain
+        tiles.forEach((tile, i) => {
+          tl.to(
+            tile,
+            { rotation: TOPPLE, duration: 0.7, ease: "power2.in" },
+            3.9 + i * 0.35,
+          );
+        });
       });
+
+      // reduced motion: show the finished scene, no pinning
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(b, { x: dist(), rotation: roll() });
+        gsap.set(tiles, { rotation: TOPPLE });
+      });
+
+      ScrollTrigger.refresh();
     });
 
-    // reduced motion: show the finished scene, no pinning
-    mm.add("(prefers-reduced-motion: reduce)", () => {
-      gsap.set(b, { x: dist(), rotation: roll() });
-      gsap.set(tiles, { rotation: TOPPLE });
-    });
-
-    // fonts change the layout height; re-measure once they land
-    document.fonts?.ready.then(() => ScrollTrigger.refresh());
-
-    return () => mm.revert();
+    return () => {
+      cancel();
+      mm?.revert();
+    };
   }, [count]);
 
   return (
