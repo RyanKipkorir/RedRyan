@@ -5,9 +5,53 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>redryan</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        min-height: 100%;
+        margin: 0;
+        background: #1a0306;
+      }
+
+      #initial-loading {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        place-items: center;
+        background: #1a0306;
+        color: #fecdd3;
+        font: 600 1rem/1.5 system-ui, sans-serif;
+        letter-spacing: 0.3em;
+        animation: initial-loading-pulse 1.75s ease-in-out infinite;
+      }
+
+      @keyframes initial-loading-pulse {
+        0%,
+        100% {
+          opacity: 0.4;
+          transform: scale(0.98);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #initial-loading {
+          animation: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="initial-loading" role="status" aria-label="Loading site">
+        LOADING...
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

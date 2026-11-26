@@ -4,8 +4,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import {
   GITHUB,
-  PROJECT_BAND_COUNT,
-  PROJECT_FINALE_TITLE,
   PROJECT_LAB,
   PROJECTS,
   SECTION_IDS,
@@ -20,7 +18,7 @@ const MAX_DEPTH = 4; // cards further back than this all share the same "far awa
 const SCALE_STEP = 0.045; // each level behind the front card shrinks by this much
 const BLUR_STEP = 1.4; // px of blur per level
 const DIM_STEP = 0.1; // brightness lost per level
-const FIN_OVERLAP = 100; // px of the stack still showing when the finale takes over
+const HOLD = "30svh"; // extra scroll the finished stack stays on screen before it lets go
 
 const pad = (n) => String(n).padStart(2, "0");
 const isExternal = (u) => u.startsWith("http");
@@ -110,31 +108,9 @@ const Projects = () => {
 
       const cards = gsap.utils.toArray(".proj-card", el);
       const inners = cards.map((c) => c.querySelector(".proj-card-inner"));
-      const finale = el.querySelector("#tools");
-      const bands = el.querySelector(".fin-bands");
+      const hold = el.querySelector(".work-hold");
 
-      /* finale effect: the bands skew with scroll velocity and trail a streak of the next color */
-      gsap.set(bands, { "--posv": 0 });
-      const skewTo = gsap.quickTo(bands, "skewX", {
-        duration: 0.5,
-        ease: "power3",
-      });
-      const streakTo = gsap.quickTo(bands, "--posv", {
-        duration: 0.5,
-        ease: "power3",
-      });
-
-      const onVelocity = (self) => {
-        const v = self.getVelocity() / 1400;
-        skewTo(gsap.utils.clamp(-18, 18, v * 5));
-        streakTo(gsap.utils.clamp(0, 1, Math.abs(v) / 1.7));
-      };
-      const settle = () => {
-        skewTo(0);
-        streakTo(0);
-      };
-
-      /* text reveal for the intro and the finale */
+      /* text reveal for the intro */
       const reveal = (selector, trigger, start = "top 80%") => {
         const targets = gsap.utils.toArray(selector, el);
         if (!targets.length) return;
@@ -163,7 +139,6 @@ const Projects = () => {
           if (!motion) return;
 
           reveal(".work-intro .proj-reveal", ".work-intro");
-          reveal(".fin .proj-reveal", finale, "top 60%");
 
           /* ── stacked cards (CodePen pattern) ── */
           const tallest = () => Math.max(...cards.map((c) => c.offsetHeight));
@@ -181,15 +156,21 @@ const Projects = () => {
             const peek = wide ? 22 : 14;
             gsap.set(inners, { transformOrigin: "50% 0%" });
 
-            /* 1. every card pins at the same spot until the finale arrives */
+            /* the finished stack stays on screen for a moment before it lets go
+               (set first, so the pins below measure the section with it) */
+            if (hold) hold.style.height = HOLD;
+
+            /* 1. every card pins at the same spot. They all let go together once the
+                  bottom of this section reaches the bottom of the stack, so the stack
+                  scrolls away as one block and never runs into the next section */
             cards.forEach((card) => {
               ScrollTrigger.create({
                 trigger: card,
                 pin: true,
                 pinSpacing: false,
                 start: () => "top " + stackTop(),
-                endTrigger: finale,
-                end: () => "top " + (stackTop() + FIN_OVERLAP),
+                endTrigger: el,
+                end: () => "bottom " + (stackTop() + tallest()),
               });
             });
 
@@ -226,36 +207,8 @@ const Projects = () => {
             });
           }
 
-          /* ── finale: bands slide across, words play when it's active ── */
-          gsap.fromTo(
-            bands,
-            { xPercent: 0 },
-            {
-              xPercent: -50,
-              ease: "none",
-              scrollTrigger: {
-                trigger: finale,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: 1,
-                onUpdate: onVelocity,
-                onLeave: settle,
-                onLeaveBack: settle,
-                onScrubComplete: settle,
-              },
-            },
-          );
-
-          ScrollTrigger.create({
-            trigger: finale,
-            start: "top 60%",
-            toggleClass: { targets: finale, className: "active" },
-          });
-
-          el.classList.add("fin-armed");
           return () => {
-            el.classList.remove("fin-armed");
-            settle();
+            if (hold) hold.style.height = "";
           };
         },
       );
@@ -396,6 +349,10 @@ const Projects = () => {
             </div>
           </article>
         ))}
+
+        {/* empty room at the end: the finished stack rests here before the page moves on
+            (GSAP sizes it only while the cards are stacking) */}
+        <div className="work-hold" aria-hidden="true" />
       </div>
     </section>
   );

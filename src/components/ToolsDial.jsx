@@ -136,12 +136,14 @@ const ToolsDial = () => {
             s.classList.toggle("is-current", i === idx);
             s.classList.toggle("is-past", i < idx);
           });
-          nextName.textContent =
-            idx < 0
-              ? TOOLS[0].name
-              : idx < N - 1
-                ? TOOLS[idx + 1].name
-                : "Napoleon Crossing the Alps";
+          if (nextName) {
+            nextName.textContent =
+              idx < 0
+                ? TOOLS[0].name
+                : idx < N - 1
+                  ? TOOLS[idx + 1].name
+                  : "Napoleon Crossing the Alps";
+          }
         };
 
         const tl = gsap.timeline({
@@ -149,7 +151,7 @@ const ToolsDial = () => {
           onUpdate: sync,
         });
 
-        /* 1 · the ring travels from the middle of the screen and docks on the left */
+        /* 1 · ring travels from middle of screen and docks on the left */
         tl.fromTo(
           wheel,
           {
@@ -175,10 +177,11 @@ const ToolsDial = () => {
           T0,
         );
 
-        /* Accolade sits to the left of the dial while docked, and fades/slides out as the dial moves left */
+        /* Accolade sits in the middle of the dial on mobile (and left of the dial on desktop),
+           then disappears cleanly as the tools dial moves left */
         tl.fromTo(
           accolade,
-          { autoAlpha: 0, x: 40 },
+          { autoAlpha: 0, x: 24 },
           { autoAlpha: 1, x: 0, duration: 0.9, ease: "power2.out" },
           DOCK - 0.8,
         );
@@ -190,12 +193,14 @@ const ToolsDial = () => {
           { autoAlpha: 1, duration: 0.9 },
           DOCK - 0.9,
         );
-        tl.fromTo(
-          dock,
-          { autoAlpha: 0, y: 20 },
-          { autoAlpha: 1, y: 0, duration: 0.7, ease: "power2.out" },
-          DOCK - 0.7,
-        );
+        if (dock) {
+          tl.fromTo(
+            dock,
+            { autoAlpha: 0, y: 20 },
+            { autoAlpha: 1, y: 0, duration: 0.7, ease: "power2.out" },
+            DOCK - 0.7,
+          );
+        }
 
         /* 2 · one tool per scroll step */
         slides.forEach((slide, k) => {
@@ -232,7 +237,7 @@ const ToolsDial = () => {
           }
         });
 
-        /* 3 · the dial and Accolade leave to the left before the paintings stage */
+        /* 3 · dial moves left and Accolade disappears with it */
         const out = holdAt(N - 1) + HOLD;
         tl.to(
           wheel,
@@ -247,14 +252,14 @@ const ToolsDial = () => {
         tl.to(
           accolade,
           {
-            x: -160,
+            x: () => (narrow() ? -120 : -180),
             autoAlpha: 0,
             duration: OUTRO * 0.75,
             ease: "power2.in",
           },
           out,
         );
-        tl.to(dock, { autoAlpha: 0, duration: 0.6 }, out);
+        if (dock) tl.to(dock, { autoAlpha: 0, duration: 0.6 }, out);
         tl.to({}, { duration: 0.3 }, out + OUTRO);
 
         ScrollTrigger.create({
@@ -281,7 +286,6 @@ const ToolsDial = () => {
   return (
     <section ref={root} className="dial" aria-label="The tools I use">
       <div className="dial-stage">
-        {/* Accolade on the left side of the dial */}
         <figure className="dial-accolade" aria-hidden="true">
           <img
             src={ACCOLADE.src}
@@ -351,19 +355,6 @@ const ToolsDial = () => {
               <p className="dial-text">{t.text}</p>
             </article>
           ))}
-        </div>
-
-        <div className="dial-dock">
-          <ol className="dial-steps" aria-hidden="true">
-            {TOOLS.map((t, i) => (
-              <li key={t.id} className="dial-step">
-                {pad(i + 1)}
-              </li>
-            ))}
-          </ol>
-          <p className="dial-next">
-            Up next <b className="dial-next-name">{TOOLS[0].name}</b>
-          </p>
         </div>
       </div>
     </section>
