@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ToolsDial from "./ToolsDial";
 import Stan from "./Stan";
 import { Pattern, Random } from "./Art/Art";
+import { MOTION_QUERY } from "../lib/motion.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -71,7 +72,7 @@ const Tools = () => {
 
     const mm = gsap.matchMedia();
 
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
+    mm.add(MOTION_QUERY, () => {
       const napoleon = bentoEl.querySelector(".bento-card--napoleon");
       const napoleonImg = bentoEl.querySelector(".bento-napoleon__img");
       const napoleonText = gsap.utils.toArray(".bento-reveal", napoleon);
@@ -177,9 +178,6 @@ const Tools = () => {
         marqueeCard.removeEventListener("pointerleave", normal);
       };
     });
-
-    /* reduced motion: nothing is hidden, the marquee stands still,
-       and Art.jsx already holds its own pieces still */
 
     let cancelled = false;
     document.fonts?.ready.then(() => {

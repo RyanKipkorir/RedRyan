@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MorphSVGPlugin } from "gsap/MorphSVGPlugin";
+import { MOTION_QUERY } from "../lib/motion.js";
 
 gsap.registerPlugin(ScrollTrigger, MorphSVGPlugin);
 
@@ -16,7 +17,7 @@ const Footer = () => {
   useLayoutEffect(() => {
     const mm = gsap.matchMedia();
 
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
+    mm.add(MOTION_QUERY, () => {
       const bounce = (self) => {
         // faster scrolling = a bigger, springier bounce
         const v = gsap.utils.clamp(
@@ -43,11 +44,6 @@ const Footer = () => {
         onEnter: bounce,
         onEnterBack: bounce,
       });
-    });
-
-    // reduced motion: just the flat edge
-    mm.add("(prefers-reduced-motion: reduce)", () => {
-      path.current.setAttribute("d", FLAT);
     });
 
     return () => mm.revert();

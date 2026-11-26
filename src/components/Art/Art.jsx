@@ -4,8 +4,7 @@ import gsap from "gsap";
 /* ════════════════════════════════════════════════════════════════════
    ART: the moving parts that live inside the Tools grid cells.
    Every piece fills its parent (the cell must be position: relative),
-   sizes itself to that cell, pauses while off screen, and holds still
-   under prefers-reduced-motion.  Hover = faster, click = from the top.
+   and pauses while off screen. Hover = faster, click = from the top.
 
    <Pattern />   rotated bands of one word, red + blue inks that multiply
    <Random />    the same letters, spiralling, gridded, scattered, reformed
@@ -16,10 +15,6 @@ import gsap from "gsap";
    ════════════════════════════════════════════════════════════════════ */
 
 /* ───────────── helpers ───────────── */
-
-const reduceMotion = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* a piece only plays while it is on screen (Random moves hundreds of letters) */
 const playWhileVisible = (el, tl) => {
@@ -82,8 +77,6 @@ export const Pattern = ({
 
   useLayoutEffect(() => {
     const el = root.current;
-    if (reduceMotion()) return;
-
     const q = gsap.utils.selector(el);
     let stop;
 
@@ -264,8 +257,6 @@ export const Random = ({ word = "Random", count = 360, className = "" }) => {
         gsap.set(seeds, { x: wordX, y: 0, opacity: 1 });
         gsap.set(rest, { x: wordX, y: 0, opacity: 0 });
 
-        if (reduceMotion()) return;
-
         const tl = gsap.timeline({
           repeat: -1,
           repeatRefresh: true /* new scatter every loop */,
@@ -412,8 +403,6 @@ export const Question = ({
 
   useLayoutEffect(() => {
     const el = root.current;
-    if (reduceMotion()) return;
-
     let io;
     const ctx = gsap.context(() => {
       const rise = gsap.from(

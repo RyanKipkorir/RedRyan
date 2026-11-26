@@ -471,25 +471,23 @@ html.is-locked {
       @apply absolute inset-0 grid place-items-center p-4 text-center font-mono text-xs font-bold text-red/60;
     }
 
-    @media (prefers-reduced-motion: no-preference) {
-      .about-stage {
-        @apply h-dvh min-h-0 py-0;
-      }
+    .about-stage {
+      @apply h-dvh min-h-0 py-0;
+    }
 
-      .about-head {
-        @apply absolute top-24 left-0 z-10;
-      }
+    .about-head {
+      @apply absolute top-24 left-0 z-10;
+    }
 
-      .about-track {
-        @apply w-max flex-nowrap;
-        column-gap: 6vw;
-        padding-left: 100vw;
-        padding-right: clamp(1.25rem, 6vw, 6rem);
-      }
+    .about-track {
+      @apply w-max flex-nowrap;
+      column-gap: 6vw;
+      padding-left: 100vw;
+      padding-right: clamp(1.25rem, 6vw, 6rem);
+    }
 
-      .about-line {
-        @apply whitespace-nowrap;
-      }
+    .about-line {
+      @apply whitespace-nowrap;
     }
   }
 
@@ -526,14 +524,12 @@ html.is-locked {
       display: inline-block;
     }
 
-    @media (prefers-reduced-motion: no-preference) {
-      .school-stage {
-        @apply grid h-dvh min-h-0 place-items-center gap-0 pt-0 pb-[40dvh] md:pb-0;
-      }
+    .school-stage {
+      @apply grid h-dvh min-h-0 place-items-center gap-0 pt-0 pb-[40dvh] md:pb-0;
+    }
 
-      .school-line {
-        grid-area: 1 / 1;
-      }
+    .school-line {
+      grid-area: 1 / 1;
     }
   }
 
@@ -1350,37 +1346,6 @@ html.is-locked {
     font-size: clamp(0.95rem, 1.2vw, 1.15rem);
     line-height: 1.6;
     color: rgb(255 255 255 / 0.8);
-  }
-
-  /* reduced motion: no pin, no dial. Every tool is simply listed */
-  @media (prefers-reduced-motion: reduce) {
-    .dial {
-      height: auto;
-    }
-
-    .dial-stage {
-      height: auto;
-      padding: 6rem 1.25rem;
-    }
-
-    .dial-wheel,
-    .dial-hint,
-    .dial-dock {
-      display: none;
-    }
-
-    .dial-copy {
-      position: static;
-      display: flex;
-      flex-direction: column;
-      gap: 3.5rem;
-      translate: none;
-    }
-
-    .dial-slide {
-      visibility: visible;
-      opacity: 1;
-    }
   }
 
   /* ═════════════════════════ PAINTINGS & NAPOLEON EDITORIAL GRID (Tools.jsx) ═════════════════════════ */
@@ -2253,10 +2218,8 @@ html.is-locked {
       @apply size-10 transition-transform duration-500 ease-out md:size-20 lg:size-24;
     }
 
-    @media (prefers-reduced-motion: no-preference) {
-      .proj-icon--spin {
-        animation: work-spin 24s linear infinite;
-      }
+    .proj-icon--spin {
+      animation: work-spin 24s linear infinite;
     }
 
     /* phones: shorter screenshot so a whole card fits the viewport while it's pinned */
@@ -2535,11 +2498,6 @@ html.is-locked {
       white-space: nowrap;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .contact-hint {
-        display: none;
-      }
-    }
   }
 
   /* ═════════════════════════ FOOTER ═════════════════════════ */

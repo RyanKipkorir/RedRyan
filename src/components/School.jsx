@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { MOTION_QUERY } from "../lib/motion.js";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -25,7 +26,7 @@ const School = () => {
 
     const mm = gsap.matchMedia();
 
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
+    mm.add(MOTION_QUERY, () => {
       const splits = [];
       const lines = gsap.utils.toArray(".school-line", el);
 

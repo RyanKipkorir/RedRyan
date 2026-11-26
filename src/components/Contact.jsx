@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CONTACT_SOCIALS } from "../../constants";
+import { MOTION_QUERY } from "../lib/motion.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -32,7 +33,7 @@ const Contact = () => {
 
     const mm = gsap.matchMedia();
 
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
+    mm.add(MOTION_QUERY, () => {
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
@@ -77,11 +78,6 @@ const Contact = () => {
             hitAt + 0.55,
           );
       });
-    });
-
-    mm.add("(prefers-reduced-motion: reduce)", () => {
-      gsap.set(b, { x: dist(), rotation: roll() });
-      gsap.set(tiles, { rotation: TOPPLE, borderColor: "#ff0000" });
     });
 
     ScrollTrigger.refresh();

@@ -2,6 +2,7 @@ import { useId, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { MOTION_QUERY } from "../lib/motion.js";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -62,7 +63,7 @@ const About = () => {
     const mm = gsap.matchMedia();
     let split = null;
 
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
+    mm.add(MOTION_QUERY, () => {
       const rises = gsap.utils.toArray(".about-rise", el);
       if (rises.length) {
         gsap.from(rises, {

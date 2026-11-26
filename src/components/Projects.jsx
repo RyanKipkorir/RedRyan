@@ -130,14 +130,11 @@ const Projects = () => {
 
       mm.add(
         {
-          motion: "(prefers-reduced-motion: no-preference)",
           tall: "(min-height: 600px)",
           wide: "(min-width: 1024px)",
         },
         (ctx) => {
-          const { motion, tall, wide } = ctx.conditions;
-          if (!motion) return;
-
+          const { tall, wide } = ctx.conditions;
           reveal(".work-intro .proj-reveal", ".work-intro");
 
           /* ── stacked cards (CodePen pattern) ── */

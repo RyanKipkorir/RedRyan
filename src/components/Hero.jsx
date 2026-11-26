@@ -5,6 +5,7 @@ import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
 import { useGSAP } from "@gsap/react";
 import { ArrowBigRight } from "lucide-react";
+import { MOTION_QUERY } from "../lib/motion.js";
 import {
   HERO_ACTIONS,
   HERO_PROFILE,
@@ -64,7 +65,7 @@ const Hero = () => {
     () => {
       const mm = gsap.matchMedia();
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+      mm.add(MOTION_QUERY, () => {
         gsap.set(".hero-reveal", { autoAlpha: 0 });
 
         /* intro: the video fades up, the letters come toward you out of the distance */
@@ -142,11 +143,6 @@ const Hero = () => {
     const v = video.current;
     if (!v) return;
 
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (still) {
-      v.pause();
-      return;
-    }
     if (!SCRUB) return;
 
     const last = () =>

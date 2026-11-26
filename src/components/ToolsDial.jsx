@@ -2,6 +2,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { MOTION_QUERY } from "../lib/motion.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -94,7 +95,7 @@ const ToolsDial = () => {
     () => {
       const mm = gsap.matchMedia();
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+      mm.add(MOTION_QUERY, () => {
         const el = root.current;
         const stage = el.querySelector(".dial-stage");
         const wheel = el.querySelector(".dial-wheel");
