@@ -11,6 +11,8 @@ const PHOTO = "/images/about.jpg";
 const HOLD = 0.5;
 /* how far (in %) a pupil can travel */
 const LOOK = 20;
+/* full turns the plus makes while the scene is pinned */
+const PLUS_TURNS = 3;
 
 /* an eye: white almond, black pupil clipped to it */
 const EYE = "M4 50Q50 2 96 50Q50 98 4 50Z";
@@ -43,15 +45,18 @@ const Eye = () => {
 const About = () => {
   const root = useRef(null);
   const track = useRef(null);
-  const line = useRef(null);
-  const photo = useRef(null);
+  const lines = useRef([]); // every .about-line (a single ref only kept the last one)
+  const plus = useRef(null);
+  const photo = useRef(null); // optional: only used if the photo figure is rendered
 
   useLayoutEffect(() => {
     const el = root.current;
     const row = track.current;
-    const text = line.current;
+    const text = lines.current.filter(Boolean);
+    const plusImg = plus.current;
     const frame = photo.current;
-    if (!el || !row || !text || !frame) return;
+    /* the photo is optional now: it must not stop the animation from running */
+    if (!el || !row || !text.length) return;
 
     const rand = (min, max) => gsap.utils.random(min, max);
     const mm = gsap.matchMedia();
@@ -79,15 +84,16 @@ const About = () => {
       const words = split.words;
       const chars = split.chars;
 
-      /* how far the row travels so its last item (the photo) lands on screen */
-      const distance = () => row.offsetWidth - window.innerWidth;
+      /* how far the row travels so its last item lands on screen */
+      const distance = () => Math.max(0, row.offsetWidth - window.innerWidth);
+      const pinLength = () => distance() + window.innerHeight * HOLD;
 
       /* 1. pin one full screen: the sentence slides across it,
             then the finished scene holds for a moment */
       ScrollTrigger.create({
         trigger: el,
         start: "top top",
-        end: () => "+=" + (distance() + window.innerHeight * HOLD),
+        end: () => "+=" + pinLength(),
         pin: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
@@ -122,8 +128,24 @@ const About = () => {
         });
       });
 
-      /* 3. the photo develops as it slides into view */
-      const img = frame.querySelector("img");
+      /* 3. the plus rolls the whole time you keep scrolling */
+      if (plusImg) {
+        gsap.to(plusImg, {
+          rotation: -360 * PLUS_TURNS,
+          transformOrigin: "50% 50%",
+          ease: "none",
+          scrollTrigger: {
+            trigger: el,
+            start: "top top",
+            end: () => "+=" + pinLength(),
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        });
+      }
+
+      /* 4. the photo develops as it slides into view (only if it exists) */
+      const img = frame?.querySelector("img");
       if (img) {
         gsap.from(img, {
           scale: 1.35,
@@ -139,7 +161,7 @@ const About = () => {
         });
       }
 
-      /* 4. the 3D word intro, plays once as the section arrives */
+      /* 5. the 3D word intro, plays once as the section arrives */
       const tl = gsap.timeline({
         scrollTrigger: { trigger: el, start: "top 65%", once: true },
       });
@@ -259,15 +281,37 @@ const About = () => {
         </div>
 
         <div className="about-track" ref={track}>
-          <p className="about-line" ref={line}>
+          <p
+            className="about-line"
+            ref={(n) => {
+              lines.current[0] = n;
+            }}
+          >
             fascinated by the intersection of
           </p>
 
-          <p className="about-line" ref={line}>
+          <p
+            className="about-line"
+            ref={(n) => {
+              lines.current[1] = n;
+            }}
+          >
             <strong>math</strong>,
-            <img src="/images/plus.png" className="size-10" />
+            <img
+              ref={plus}
+              src="/images/plus.png"
+              alt=""
+              draggable={false}
+              className="inline-block size-10"
+            />
           </p>
-          <p className="about-line" ref={line}>
+
+          <p
+            className="about-line"
+            ref={(n) => {
+              lines.current[2] = n;
+            }}
+          >
             <strong>motion</strong> and. <strong>visual storytelling</strong>
           </p>
 
@@ -275,18 +319,6 @@ const About = () => {
             <Eye />
             <Eye />
           </div>
-
-          {/* <figure className="about-photo" ref={photo}>
-            <span className="about-photo-fallback">{PHOTO}</span>
-            <img
-              src={PHOTO}
-              alt="Ryan Kipkorir"
-              draggable={false}
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
-          </figure> */}
         </div>
       </div>
     </section>
