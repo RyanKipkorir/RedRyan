@@ -105,7 +105,7 @@ const PROJECTS = [
     kind: "Software & film studio",
     blurb: "A software and film studio, co-founded with alumni from MMU.",
     tags: ["Software", "Film", "Music"],
-    url: "#",
+    url: "https://www.ystudios.co.ke/",
     image: "/images/ystudios.jpg",
   },
   {
@@ -115,18 +115,18 @@ const PROJECTS = [
     blurb:
       "A platform tokenizing equities and bonds on Hedera.Incubated by The NSE",
     tags: ["Web3", "Fintech", "Tokenization"],
-    url: "#",
+    url: "https://www.nbx-exchange.co.ke/",
     image: "/images/nbx.jpg",
   },
   {
-    id: "sundara",
-    name: "Sundara Africa",
-    kind: "Solar-powered food drying",
+    id: "ndimi",
+    name: "Ndimi AI",
+    kind: "Every African Language Understood",
     blurb:
-      "Website for Sundara Africa’s solar-powered food drying technology, designed and developed end to end.",
-    tags: ["Cleantech", "Marketing site"],
-    url: "#",
-    image: "/images/sundara.jpg",
+      "Ndimi, meaning “tongues” in Swahili, is an app designed to bridge multiple languages",
+    tags: ["AI", "Translation"],
+    url: "https://ndimilanding-jjfm.vercel.app/",
+    image: "/images/ndimi.jpg",
   },
   {
     id: "monstertrux",
@@ -135,7 +135,7 @@ const PROJECTS = [
     blurb:
       "Explore and race to Monsterlands. A web3 game experience built on Polygon.",
     tags: ["Web3", "Polygon", "Game"],
-    url: "#",
+    url: "https://monstertrux.vercel.app/",
     image: "/images/monster.jpg",
   },
   {
@@ -145,7 +145,7 @@ const PROJECTS = [
     blurb:
       "A notebook app, designed and developed with secrecy at its core with dissappearing messages.",
     tags: ["Landing page", "React", "GSAP"],
-    url: "#",
+    url: "https://redkeep.lewiseman.com/",
     image: "/images/redkeep.jpg",
   },
 ];
