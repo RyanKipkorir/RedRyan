@@ -246,11 +246,10 @@ const Projects = () => {
       {/* intro */}
       <div className="work-intro">
         <h2 className="work-title">
-          <span className="proj-reveal">Selected</span>
+          <span className="proj-reveal text-white">Selected</span>
           <span className="work-title-outline proj-reveal">Work</span>
         </h2>
         <p className="work-sub proj-reveal">Things I’ve built</p>
-        <p className="work-hint proj-reveal">Scroll ↓</p>
       </div>
 
       {/* stacked project cards */}

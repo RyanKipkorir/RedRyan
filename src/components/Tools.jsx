@@ -199,12 +199,6 @@ const Tools = () => {
       className="tools"
       aria-labelledby="tools-heading"
     >
-      <div className="tools-banner tone-red">
-        <h2 id="tools-heading" className="tools-banner__title">
-          Tools
-        </h2>
-      </div>
-
       <div className="paintings-world">
         {/* 01 · the dial, one screen tall, pinned while the tools turn */}
         <ToolsDial />

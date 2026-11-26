@@ -14,7 +14,6 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [showLoader, setShowLoader] = useState(true);
 
   useEffect(() => {
     const startedAt = performance.now();
@@ -44,12 +43,6 @@ const App = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (isLoading) return;
-    const timer = window.setTimeout(() => setShowLoader(false), 500);
-    return () => window.clearTimeout(timer);
-  }, [isLoading]);
-
   return (
     <>
       <main aria-hidden={isLoading}>
@@ -62,12 +55,8 @@ const App = () => {
         <Contact />
         <Footer />
       </main>
-      {showLoader && (
-        <div
-          className={`loading-screen${isLoading ? "" : " loading-screen--exit"}`}
-          role="status"
-          aria-label="Loading site"
-        >
+      {isLoading && (
+        <div className="loading-screen" role="status" aria-label="Loading site">
           <Loading />
         </div>
       )}

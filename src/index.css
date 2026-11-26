@@ -65,11 +65,7 @@ html.is-locked {
   }
 
   .loading-screen {
-    @apply fixed inset-0 z-[100] transition-opacity duration-500;
-  }
-
-  .loading-screen--exit {
-    @apply pointer-events-none opacity-0;
+    @apply fixed inset-0 z-[100];
   }
 
   .noisy {
@@ -567,22 +563,6 @@ html.is-locked {
       position: relative;
       width: 100%;
       background-color: var(--color-red);
-      color: #000;
-      background-image:
-        linear-gradient(rgb(0 0 0 / 0.16) 2px, transparent 2px),
-        linear-gradient(90deg, rgb(0 0 0 / 0.16) 2px, transparent 2px),
-        linear-gradient(rgb(0 0 0 / 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgb(0 0 0 / 0.08) 1px, transparent 1px);
-      background-size:
-        100px 100px,
-        100px 100px,
-        20px 20px,
-        20px 20px;
-      background-position:
-        -2px -2px,
-        -2px -2px,
-        -1px -1px,
-        -1px -1px;
     }
 
     /* Accolade: centered horizontally on mobile in step 1, moves left with the dial and fades out */
@@ -607,11 +587,15 @@ html.is-locked {
         object-fit: cover;
       }
 
+      /* mobile: GSAP animates x on this element and takes over `translate`, so there is no
+         horizontal centring here and `left` is the image's left edge. It sits just right of
+         the active tool, whose centre is --cx + 28svh (see dockedR in ToolsDial.jsx).
+         Nudge it with the last number: bigger = further right */
       @media (max-width: 1023px) {
-        left: 50%;
+        left: calc(var(--cx) + 28svh + 3.25rem);
         top: 28%;
         width: clamp(5.5rem, 22vw, 7.25rem);
-        translate: -50% -50%;
+        translate: 0 -50%;
       }
     }
 
@@ -654,12 +638,6 @@ html.is-locked {
       box-shadow:
         0 0 0 3px var(--color-red),
         0 0 0 6px #000;
-    }
-
-    .dial-center-kicker,
-    .dial-center-quote,
-    .dial-title {
-      color: #000;
     }
 
     .dial-hint,
@@ -1102,7 +1080,7 @@ html.is-locked {
   }
 
   .stan-scramble {
-    @apply font-bold text-red;
+    @apply font-bold text-white;
   }
 
   .story-live {
@@ -1147,21 +1125,6 @@ html.is-locked {
   /* ═════════════════════════ TOOLS WORLD: one red grid behind the dial chapter and the paintings (Tools.jsx) ═════════════════════════ */
   .paintings-world {
     @apply relative w-full bg-red text-black;
-    background-image:
-      linear-gradient(rgb(0 0 0 / 0.16) 2px, transparent 2px),
-      linear-gradient(90deg, rgb(0 0 0 / 0.16) 2px, transparent 2px),
-      linear-gradient(rgb(0 0 0 / 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(0 0 0 / 0.08) 1px, transparent 1px);
-    background-size:
-      100px 100px,
-      100px 100px,
-      20px 20px,
-      20px 20px;
-    background-position:
-      -2px -2px,
-      -2px -2px,
-      -1px -1px,
-      -1px -1px;
   }
 
   /* ═════════════════════════ TOOLS DIAL (ToolsDial.jsx): the skills circle travels from the middle of the screen to the left ═════════════════════════ */
@@ -1317,12 +1280,9 @@ html.is-locked {
     width: min(20rem, calc(var(--ro) * 1.2));
   }
 
-  .dial-center-kicker {
-    @apply font-mono text-xs font-bold tracking-widest text-red uppercase;
-  }
-
   .dial-center-quote {
-    font-family: var(--font-serif);
+    @apply text-white font-effect;
+
     font-style: italic;
     font-weight: 400;
     font-size: clamp(1.5rem, 2.6vw, 2.5rem);
@@ -1373,6 +1333,7 @@ html.is-locked {
   }
 
   .dial-title {
+    @apply text-white;
     font-family: var(--font-effect);
     font-weight: 700;
     font-size: clamp(2.25rem, 5vw, 5.5rem);
@@ -2133,10 +2094,6 @@ html.is-locked {
 
     .work-sub {
       @apply font-hand text-4xl leading-none md:text-6xl;
-    }
-
-    .work-hint {
-      @apply font-mono text-sm;
     }
 
     /* ── the stack: cards pin at the same spot, GSAP (Projects.jsx) scales/blurs the ones underneath ── */

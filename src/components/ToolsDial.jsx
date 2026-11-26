@@ -86,7 +86,6 @@ const VH_PER_UNIT = 0.42;
 const T0 = 0.4;
 
 const N = TOOLS.length;
-const pad = (n) => String(n).padStart(2, "0");
 
 const ToolsDial = () => {
   const root = useRef(null);
@@ -335,7 +334,6 @@ const ToolsDial = () => {
           <span className="dial-needle" />
 
           <div className="dial-center">
-            <span className="dial-center-kicker">01 · Tools</span>
             <strong className="dial-center-quote">
               Every craft is knighted by its tools.
             </strong>
@@ -345,11 +343,10 @@ const ToolsDial = () => {
         <p className="dial-hint">Scroll through the tools</p>
 
         <div className="dial-copy">
-          {TOOLS.map((t, i) => (
+          {TOOLS.map((t) => (
             <article key={t.id} className="dial-slide">
               <div className="dial-meta">
-                <span className="dial-chip">TOOL {pad(i + 1)}</span>
-                <span className="dial-name">{t.name}</span>
+                <span className="dial-chip">{t.name}</span>
               </div>
               <h3 className="dial-title">{t.title}</h3>
               <p className="dial-text">{t.text}</p>

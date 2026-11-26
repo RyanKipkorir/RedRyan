@@ -268,10 +268,7 @@ const About = () => {
             <img src="/images/plus.png" className="size-10" />
           </p>
           <p className="about-line" ref={line}>
-            <strong>motion</strong> and.
-          </p>
-          <p className="font-vietnam text-6xl">
-            <strong>visual storytelling</strong>
+            <strong>motion</strong> and. <strong>visual storytelling</strong>
           </p>
 
           <div className="about-eyes" aria-hidden="true">
@@ -279,7 +276,7 @@ const About = () => {
             <Eye />
           </div>
 
-          <figure className="about-photo" ref={photo}>
+          {/* <figure className="about-photo" ref={photo}>
             <span className="about-photo-fallback">{PHOTO}</span>
             <img
               src={PHOTO}
@@ -289,7 +286,7 @@ const About = () => {
                 e.currentTarget.style.display = "none";
               }}
             />
-          </figure>
+          </figure> */}
         </div>
       </div>
     </section>
