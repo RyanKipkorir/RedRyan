@@ -25,8 +25,8 @@ const STANCZYK = {
   title: "History repeats itself.",
   by: "Stańczyk by Jan Matejko, 1862",
   paragraphs: [
-    "Matejko painted the court jester sitting out a ball while the news of Smolensk’s fall sinks in. The music plays on. He is the only one in the room who understands what just happened.",
-    "Different century, same room. On October 30 GitHub suspended my account while I was shipping an APK with a local AI and a self-custodial wallet. The party carried on and I sat it out, like the jester. The room changes, the jester’s chair doesn’t.",
+    "Matejko painted the court jester sitting out a ball while the news of Smolensk’s fall sinks in. Different century, same room. On October 30 GitHub suspended my account.",
+    "I was shipping an APK with a local AI and a self-custodial wallet. The party carried on and I sat it out, like the jester. The room changes, the jester’s chair doesn’t.",
   ],
 };
 
@@ -265,12 +265,12 @@ const Tools = () => {
 
             <article className="bento-card bento-card--pattern">
               <Pattern word="Pattern" rows={16} />
-              <span className="bento-tag">Pattern</span>
+              <span className="bento-tag">Is it a</span>
             </article>
 
             <article className="bento-card bento-card--random">
               <Random word="Random" />
-              <span className="bento-tag">Random</span>
+              <span className="bento-tag">Or</span>
             </article>
           </div>
         </section>
@@ -287,11 +287,12 @@ const Tools = () => {
             </div>
 
             <div className="stan-split__copy">
-              <span className="craft-kicker">{STANCZYK.kicker}</span>
-              <h3 className="stan-split__heading">{STANCZYK.title}</h3>
-              <p className="stan-split__by">{STANCZYK.by}</p>
+              <h3 className="stan-split__heading text-white">
+                {STANCZYK.title}
+              </h3>
+
               {STANCZYK.paragraphs.map((p) => (
-                <p key={p} className="stan-split__text">
+                <p key={p} className="stan-split__text ">
                   {p}
                 </p>
               ))}

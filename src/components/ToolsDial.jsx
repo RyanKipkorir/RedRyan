@@ -47,14 +47,7 @@ const TOOLS = [
     title: "From prototype to production.",
     text: "The App Router, server rendering and API routes carry my standalone apps and the analytics dashboard I keep on Vercel.",
   },
-  {
-    id: "gsap",
-    name: "GSAP",
-    mono: "Gs",
-    src: "/images/skills/gsap.png",
-    title: "Motion on a timeline.",
-    text: "ScrollTrigger, Flip, Draggable and SVG drawing drive almost every animation on this site. If it moves, it’s scripted.",
-  },
+
   {
     id: "figma",
     name: "Figma",
@@ -67,7 +60,7 @@ const TOOLS = [
     id: "r",
     name: "R",
     mono: "R",
-    src: "/images/skills/r.png",
+    src: "/images/skills/rstudio.png",
     title: "Where numbers show their shape.",
     text: "Statistics, simulation and plots from my pure mathematics side. I like to see the data before I trust it.",
   },
@@ -318,7 +311,6 @@ const ToolsDial = () => {
             {TOOLS.map((t, i) => (
               <div key={t.id} className="dial-item" style={{ "--i": i }}>
                 <div className="dial-face">
-                  <span className="dial-mono">{t.mono}</span>
                   <img
                     src={t.src}
                     alt=""
@@ -341,7 +333,7 @@ const ToolsDial = () => {
           </div>
         </div>
 
-        <p className="dial-hint">Scroll through the tools</p>
+        <p className="dial-hint">Tech</p>
 
         <div className="dial-copy">
           {TOOLS.map((t) => (

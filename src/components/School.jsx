@@ -8,10 +8,10 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 
 /* the lines that fly toward you, one after another — edit freely */
 const LINES = [
-  { kicker: "School", text: "Multimedia University of Kenya" },
-  { kicker: "Degree", text: "BSc Mathematics & Computer Science" },
+  { kicker: "I studied", text: "Math & Comp Science" },
+  { kicker: "At The", text: "Multimedia University of Kenya" },
   { kicker: "Focus", text: "Pure Mathematics" },
-  { kicker: "Years", text: "2021 — 2025" },
+  { kicker: "Currently", text: "Working at Ystudios" },
 ];
 
 /* viewport heights of scroll each line gets */

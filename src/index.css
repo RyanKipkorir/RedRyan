@@ -1321,7 +1321,7 @@ html.is-locked {
   }
 
   .dial-chip {
-    @apply rounded-md bg-red px-2.5 py-1 font-mono text-xs font-bold text-black;
+    @apply rounded-md bg-red px-2.5 py-1 font-mono text-xs font-bold text-white;
   }
 
   .dial-name {
@@ -2497,7 +2497,6 @@ html.is-locked {
     .contact-link__label {
       white-space: nowrap;
     }
-
   }
 
   /* ═════════════════════════ FOOTER ═════════════════════════ */

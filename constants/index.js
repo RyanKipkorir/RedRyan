@@ -53,7 +53,7 @@ const HERO_SERVICES = [
 ];
 const HERO_ACTIONS = [
   { label: "My work", href: `#${SECTION_IDS.projects}`, tone: "red" },
-  { label: "Who is Red?", href: `#${SECTION_IDS.about}`, tone: "white" },
+  { label: "Who is Ryan?", href: `#${SECTION_IDS.about}`, tone: "white" },
 ];
 const HERO_RED_LETTERS = ["H", "E", "L", "L", "0"];
 const HERO_RYAN_LETTERS = ["W", "0", "R", "L", "D"];
