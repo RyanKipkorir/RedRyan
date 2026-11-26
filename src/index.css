@@ -58,11 +58,6 @@ html.is-locked {
   @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
 }
 
-/* ─────────────────────────────────────────────────────────────
-   One block per section, in page order:
-   SHARED · #nav · #menu · #hero · #story (+ stan + skills ring) ·
-   #work (+ finale) · #contact · #footer
-   ───────────────────────────────────────────────────────────── */
 @layer components {
   /* ═════════════════════════ SHARED ═════════════════════════ */
   main {
@@ -235,9 +230,23 @@ html.is-locked {
     }
   }
 
+  /* ═════════════════════════ HERO BACKDROP (fixed video: Hero → About → School) ═════════════════════════ */
+  .hero-bg {
+    @apply pointer-events-none fixed inset-0 z-0 overflow-hidden bg-black;
+  }
+
+  /* mobile: glued to the very bottom of the screen; md and up: fills the screen */
+  .hero-video {
+    @apply absolute bottom-0 left-0 block h-[42dvh] w-full object-cover object-bottom md:inset-0 md:h-full md:object-center;
+  }
+
+  .hero-noise {
+    @apply opacity-20;
+  }
+
   /* ═════════════════════════ HERO ═════════════════════════ */
   #hero {
-    @apply relative z-10 min-h-dvh w-full overflow-clip bg-black text-red;
+    @apply relative z-10 min-h-dvh w-full overflow-clip text-red;
 
     a {
       @apply cursor-pointer text-red transition-colors duration-300;
@@ -247,91 +256,54 @@ html.is-locked {
       }
     }
 
-    /* MetaBalls, right side */
-    .hero-balls {
-      @apply absolute top-0 right-0 z-0 h-full w-full lg:w-[55%];
+    /* image, top left */
+    .left-quart {
+      @apply absolute left-0 md:top-20 xl:top-36 2xl:top-52 md:bottom-auto -bottom-20 md:w-fit w-1/3;
     }
 
-    .hero-noise {
-      @apply pointer-events-none z-20 opacity-20;
+    /* down arrows, right */
+    .right-arrow {
+      @apply absolute right-0 md:bottom-0 xl:top-0 2xl:top-12 top-1/2 md:w-fit w-24;
     }
 
-    /* layout (no z-index here, so the text can blend with the balls behind it) */
+    /* mobile: the bottom padding keeps the content above the video strip */
     .hero-inner {
-      @apply pointer-events-none relative container mx-auto flex min-h-dvh flex-col justify-between px-5 pt-28 pb-24 lg:px-0 lg:pt-32;
+      @apply relative container mx-auto flex min-h-dvh flex-col px-5 pt-28 pb-[44dvh] md:pb-24 lg:px-0 lg:pt-32;
       --hero-fs: clamp(4.5rem, min(18vw, 24dvh), 19rem);
-
-      /* let the mouse reach the balls, but keep links and list items clickable */
-      :is(a, li) {
-        @apply pointer-events-auto;
-      }
-    }
-
-    /* red text turns black where it crosses a red ball */
-    .hero-word,
-    .hero-aside,
-    .hero-small,
-    .hero-vertical,
-    .hero-sphere {
-      mix-blend-mode: difference;
     }
 
     .hero-main {
-      @apply flex flex-col gap-8 lg:gap-10;
-    }
-
-    .hero-small {
-      @apply font-mono text-xs md:text-sm;
+      @apply my-auto flex flex-col items-center gap-8 text-center lg:gap-10;
     }
 
     /* big type */
     .hero-rows {
-      @apply flex flex-col gap-4 lg:gap-0;
+      @apply flex flex-col items-center gap-4 lg:gap-0;
     }
 
-    .hero-row {
-      @apply flex flex-col lg:flex-row lg:items-center lg:gap-10;
-    }
-
-    .hero-row--ryan {
-      @apply lg:justify-start;
-
-      .hero-word {
-        @apply order-first lg:order-none;
-      }
-
-      .hero-aside {
-        @apply text-left lg:mb-6 lg:self-end lg:text-right;
-      }
-    }
-
-    .hero-row--red .hero-aside {
-      @apply lg:mt-6 lg:ml-auto lg:max-w-[24ch] lg:self-start;
-    }
-
+    /* perspective lives here so the letters can come toward you in depth */
     .hero-word {
-      @apply flex font-vietnam font-bold select-none;
+      @apply flex justify-center font-vietnam font-bold select-none;
       font-size: var(--hero-fs);
       line-height: 0.82;
       letter-spacing: -0.06em;
+      perspective: 900px;
     }
 
     .hero-letter {
       @apply relative inline-block;
     }
 
-    .hero-glyph {
-      @apply pointer-events-none absolute text-red;
-      left: var(--gx, 50%);
-      top: var(--gy, 50%);
-      width: var(--gs, 0.3em);
-      height: var(--gs, 0.3em);
-      margin-left: calc(var(--gs, 0.3em) / -2);
-      margin-top: calc(var(--gs, 0.3em) / -2);
+    .hero-statement {
+      @apply font-mono text-xs leading-relaxed text-white md:text-sm;
+
+      &::after {
+        content: "_";
+        animation: hero-blink 1s steps(1) infinite;
+      }
     }
 
-    /* the two buttons: same width as the RYAN word, equal columns
-       (scoped so the generic link hover doesn't recolor them) */
+    /* the two buttons: same width as the RYAN word, equal columns */
     .hero-cta {
       @apply grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4;
       width: min(100%, max(28rem, calc(var(--hero-fs) * 2.16)));
@@ -388,57 +360,18 @@ html.is-locked {
       }
     }
 
-    /* side text */
-    .hero-aside {
-      @apply font-mono text-xs leading-relaxed md:text-sm text-white mt-2;
-    }
-
-    .hero-statement::after {
-      content: "_";
-      animation: hero-blink 1s steps(1) infinite;
-    }
-
-    .hero-list {
-      @apply flex list-none flex-col gap-1;
-
-      li {
-        @apply cursor-default text-left;
-      }
-    }
-
-    .hero-list-n {
-      @apply mr-2 opacity-70;
-    }
-
-    /* bottom right */
+    /* bottom left */
     .hero-meta {
-      @apply flex items-center justify-end pt-6;
+      @apply self-start pt-6;
     }
 
-    .hero-meta-group {
-      @apply flex flex-wrap items-center gap-4 md:gap-6;
-    }
-
-    .hero-sphere {
-      @apply size-14 md:size-20;
-    }
-
-    .hero-vertical {
-      @apply absolute top-1/2 right-3 z-10 hidden -translate-y-1/2 font-mono text-xs lg:block;
-      writing-mode: vertical-rl;
-    }
-
-    .hero-scroll {
-      @apply absolute bottom-0 left-1/2 z-10 flex h-[72px] w-16 -translate-x-1/2 flex-col items-center gap-2 overflow-hidden font-mono text-[10px] tracking-widest uppercase;
-    }
-
-    .hero-scroll-line {
-      @apply block h-12 w-px bg-current;
+    .hero-small {
+      @apply font-mono text-xs md:text-sm;
     }
   }
 
-  /* ═════════════════════════ STORY (one sub-block per component) ═════════════════════════ */
-  #story {
+  /* ═════════════════════════ ABOUT ═════════════════════════ */
+  #about {
     @apply relative z-10 w-full;
 
     strong {
@@ -453,46 +386,19 @@ html.is-locked {
       letter-spacing: 0;
     }
 
-    /* ─────────────── SHARED: tones, layout, type, plus icon ─────────────── */
-
-    /* tones: red, dark, white */
-    .tone-dark {
-      @apply bg-black text-red;
+    .about-stage {
+      @apply relative flex min-h-dvh w-full flex-col justify-center gap-10 overflow-hidden py-28 text-red;
     }
 
-    .tone-red {
-      @apply bg-red text-dark;
+    .about-head {
+      @apply flex flex-col gap-6 px-5 lg:px-[6vw];
     }
 
-    .tone-white {
-      @apply bg-white text-dark;
-
-      strong {
-        @apply text-red;
-      }
-    }
-
-    /* the standard beat: a full-height column, content sits off-centre */
-    .story-beat {
-      @apply relative flex min-h-dvh flex-col justify-center gap-6 px-5 py-28 lg:pr-[14vw] lg:pl-[6vw];
-      z-index: 5;
-    }
-
-    /* pushed to the right of the column / stepped in from the left */
-    .story-aside {
-      @apply lg:ml-auto;
-    }
-
-    .story-indent {
-      @apply lg:ml-[8vw];
-    }
-
-    /* type scale */
-    .story-kicker {
+    .about-kicker {
       @apply font-mono text-xs font-bold tracking-widest uppercase opacity-70 md:text-sm;
     }
 
-    .story-big {
+    .about-big {
       font-family: var(--font-effect);
       font-weight: 700;
       font-size: clamp(2rem, 5vw, 6.5rem);
@@ -502,105 +408,11 @@ html.is-locked {
       text-wrap: balance;
     }
 
-    .story-text {
-      font-family: var(--font-effect);
-      font-weight: 400;
-      font-size: clamp(1.1rem, 2.1vw, 2rem);
-      line-height: 1.28;
-      letter-spacing: -0.02em;
-      max-width: 26em;
+    .about-track {
+      @apply flex flex-wrap items-center gap-x-10 gap-y-8 px-5 lg:px-[6vw];
     }
 
-    /* the plus at the right edge (desktop, motion only) */
-    .story-plus {
-      position: fixed;
-      top: 50%;
-      right: clamp(1rem, 3vw, 3rem);
-      z-index: 30;
-      width: clamp(2.5rem, 4.5vw, 4.5rem);
-      aspect-ratio: 1;
-      translate: 0 -50%;
-      pointer-events: none;
-      opacity: 0;
-      visibility: hidden;
-      display: none;
-
-      @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-        display: block;
-      }
-    }
-
-    .story-plus-svg {
-      @apply size-full overflow-visible;
-
-      path {
-        fill: var(--color-red);
-        stroke: #fff;
-        stroke-width: 3;
-        stroke-linejoin: round;
-      }
-    }
-
-    /* ─────────────── Story1: the eyes and the quote ─────────────── */
-    .story-solo {
-      @apply flex min-h-dvh flex-col items-center justify-center gap-8 px-5 py-24 text-center lg:px-[6vw];
-      z-index: 7;
-    }
-
-    .story-eyes {
-      @apply flex justify-center gap-3 md:gap-5;
-
-      /* the solo beat has bigger eyes and more room between them */
-      .story-solo & {
-        @apply gap-4 md:gap-8;
-      }
-    }
-
-    .story-eye-art {
-      @apply items-center overflow-hidden;
-
-      .story-eye-svg {
-        width: clamp(7rem, 26vw, 24rem);
-      }
-    }
-
-    .story-eye-svg {
-      width: clamp(4rem, 10vw, 9rem);
-      height: auto;
-      overflow: visible;
-
-      .story-solo & {
-        width: clamp(8rem, 22vw, 20rem);
-      }
-    }
-
-    .story-quote {
-      @apply flex max-w-[34em] flex-col gap-3;
-
-      blockquote {
-        font-family: var(--font-hand);
-
-        font-size: clamp(1.4rem, 2.8vw, 2.8rem);
-        line-height: 1.15;
-        text-wrap: balance;
-      }
-
-      figcaption {
-        @apply font-mono text-xs font-bold tracking-widest uppercase opacity-70 md:text-sm;
-      }
-    }
-
-    /* ─────────────── Story2: the sentence that slides across a pinned screen ─────────────── */
-    .story-hscroll {
-      @apply relative flex flex-col justify-center gap-10 px-5 py-28 lg:px-[6vw];
-      z-index: 6;
-    }
-
-    .story-hscroll-head {
-      @apply flex flex-col gap-6;
-    }
-
-    .story-hscroll-text {
+    .about-line {
       @apply block;
       font-family: var(--font-effect);
       font-weight: 400;
@@ -609,350 +421,1371 @@ html.is-locked {
       letter-spacing: -0.04em;
     }
 
-    /* SplitText: words and letters must be boxes so they can move on their own */
-    .story-hscroll-text .word,
-    .story-hscroll-text .char {
+    .about-line .word,
+    .about-line .char {
       display: inline-block;
     }
 
-    /* motion on: a full-height pinned screen; the sentence starts off the right edge */
+    .about-eyes {
+      @apply flex flex-none items-center;
+      gap: clamp(0.75rem, 2vw, 2rem);
+    }
+
+    .about-eye-svg {
+      display: block;
+      width: clamp(6rem, 17vw, 17rem);
+      height: auto;
+      overflow: visible;
+    }
+
+    .about-photo {
+      @apply relative flex-none overflow-hidden border-2 border-white bg-dark;
+      height: clamp(14rem, 50dvh, 32rem);
+      aspect-ratio: 4 / 5;
+      box-shadow: 10px 10px 0 var(--color-red);
+      transition:
+        transform 0.5s ease,
+        box-shadow 0.5s ease;
+
+      img {
+        @apply relative z-10 block size-full object-cover;
+        filter: grayscale(1) contrast(1.05);
+        transition: filter 0.5s ease;
+      }
+
+      &:hover {
+        transform: translate(-6px, -6px) rotate(-0.6deg);
+        box-shadow: 16px 16px 0 var(--color-red);
+
+        img {
+          filter: none;
+        }
+      }
+    }
+
+    .about-photo-fallback {
+      @apply absolute inset-0 grid place-items-center p-4 text-center font-mono text-xs font-bold text-red/60;
+    }
+
     @media (prefers-reduced-motion: no-preference) {
-      .story-hscroll {
-        @apply h-dvh min-h-0 overflow-hidden py-0;
-      }
-
-      .story-hscroll-head {
-        @apply absolute top-24 left-5 lg:left-[6vw];
-      }
-
-      .story-hscroll-text {
-        @apply w-max whitespace-nowrap;
-        padding-left: 100vw;
-      }
-    }
-
-    /* ─────────────── Story3: the school beat and the DrawSVG ring ─────────────── */
-    .story-art {
-      @apply mx-auto mt-6 block h-auto w-[min(70vw,18rem)];
-    }
-
-    /* ─────────────── Story4: black beat, red particle waves, pinned list ─────────────── */
-    .story-flow {
-      @apply relative isolate flex min-h-dvh w-full flex-col justify-center overflow-hidden bg-black;
-      z-index: 4;
-    }
-
-    /* the three.js canvas fills the beat and sits behind the copy */
-    .story-particles {
-      @apply pointer-events-none absolute inset-0 z-0 block size-full;
-    }
-
-    /* default (reduced motion / mobile): copy stacks above the still wave */
-    .story-flow-stage {
-      @apply relative z-10 flex flex-col justify-center gap-6 px-5 py-28 lg:pr-[14vw] lg:pl-[6vw];
-    }
-
-    .story-flow-kicker {
-      @apply relative;
-      color: var(--color-red);
-    }
-
-    .story-flow-list {
-      @apply m-0 flex list-none flex-col p-0;
-      gap: 0.35em;
-      font-family: var(--font-effect);
-      font-weight: 700;
-      font-size: clamp(1.6rem, 4.2vw, 4.75rem);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-      color: var(--color-red);
-
-      li {
-        will-change: transform, opacity;
-      }
-    }
-
-    /* each sentence is wrapped so its span can rise in on its own */
-    .story-line-in {
-      @apply inline-block;
-    }
-
-    /* motion on: the whole beat is one pinned screen; the kicker sits top-left and the list scrolls past */
-    @media (prefers-reduced-motion: no-preference) {
-      .story-flow {
+      .about-stage {
         @apply h-dvh min-h-0 py-0;
       }
 
-      .story-flow-stage {
-        @apply absolute inset-0 py-0;
+      .about-head {
+        @apply absolute top-24 left-0 z-10;
       }
 
-      .story-flow-kicker {
-        @apply absolute top-24 left-5 lg:left-[6vw];
+      .about-track {
+        @apply w-max flex-nowrap;
+        column-gap: 6vw;
+        padding-left: 100vw;
+        padding-right: clamp(1.25rem, 6vw, 6rem);
       }
 
-      .story-flow-list {
-        @apply absolute top-0 right-5 lg:right-[14vw];
-        left: clamp(6rem, 22vw, 24rem);
-        padding-block: 46dvh;
+      .about-line {
+        @apply whitespace-nowrap;
+      }
+    }
+  }
 
-        li {
-          opacity: 0.2;
+  /* ═════════════════════════ SCHOOL ═════════════════════════ */
+  #school {
+    @apply relative z-10 w-full;
+
+    .school-stage {
+      @apply relative flex min-h-dvh w-full flex-col items-center justify-center gap-14 px-5 py-28 text-center text-white;
+    }
+
+    .school-line {
+      @apply flex flex-col items-center gap-3;
+      perspective: 900px;
+    }
+
+    .school-kicker {
+      @apply font-mono text-xs font-bold tracking-widest text-red uppercase md:text-sm;
+    }
+
+    .school-text {
+      @apply block;
+      font-family: var(--font-effect);
+      font-weight: 700;
+      font-size: clamp(2.25rem, 7vw, 8rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      max-width: 12em;
+      text-wrap: balance;
+      transform-style: preserve-3d;
+    }
+
+    .school-word {
+      display: inline-block;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .school-stage {
+        @apply grid h-dvh min-h-0 place-items-center gap-0 pt-0 pb-[40dvh] md:pb-0;
+      }
+
+      .school-line {
+        grid-area: 1 / 1;
+      }
+    }
+  }
+
+  #tools {
+    position: relative;
+    width: 100%;
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+    background-color: #000;
+    color: var(--color-dark);
+
+    .tone-dark {
+      background-color: #000;
+      color: var(--color-red);
+    }
+
+    .tone-red {
+      background-color: var(--color-red);
+      color: #000;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0 0 auto 0;
+      width: 100%;
+      height: clamp(11rem, 32dvh, 22rem);
+      overflow: hidden;
+      pointer-events: none;
+      filter: drop-shadow(0 0 6px rgb(255 0 0 / 0.55));
+
+      line {
+        stroke: var(--color-red);
+        stroke-width: 1.4;
+        stroke-linecap: round;
+      }
+    }
+
+    .paintings-world {
+      position: relative;
+      width: 100%;
+      background-color: #000;
+      color: #fff;
+    }
+
+    /* Accolade on the left of the dial, fading/sliding out as the dial moves left */
+    .dial-accolade {
+      position: absolute;
+      left: clamp(1.25rem, 4vw, 3.5rem);
+      top: 50%;
+      width: clamp(7.5rem, 13vw, 11.5rem);
+      aspect-ratio: 4 / 5;
+      translate: 0 -50%;
+      overflow: hidden;
+      border: 2px solid var(--color-red);
+      background: #000;
+      z-index: 3;
+      pointer-events: none;
+      will-change: transform, opacity;
+
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      @media (max-width: 1023px) {
+        left: 1.25rem;
+        top: 14%;
+        width: clamp(4.75rem, 18vw, 6.25rem);
+        translate: 0 -50%;
+      }
+    }
+
+    /* Clean Napoleon card without extra grid lines or clutter */
+    .napoleon-simple {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(1.25rem, 3vw, 2.5rem);
+      width: min(84vw, 58rem);
+      margin-left: clamp(4.5rem, 22vw, 18rem);
+      padding: clamp(1.25rem, 2.5vw, 2rem);
+      background: #000;
+      color: #fff;
+      border: 1px solid rgb(255 255 255 / 0.14);
+      will-change: transform, opacity;
+
+      @media (min-width: 1024px) {
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.85fr);
+      }
+
+      @media (max-width: 1023px) {
+        width: min(88vw, 32rem);
+        margin-inline: auto;
+      }
+    }
+
+    .napoleon-simple__copy {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .napoleon-simple__media {
+      overflow: hidden;
+      aspect-ratio: 4 / 5;
+      max-height: 21rem;
+      justify-self: center;
+      width: 100%;
+
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    /* Clean up extra info on Accolade / Stan and keep styling minimal */
+    .paintings-box--accolade .accolade-veil,
+    .paintings-img--stan .stan-title,
+    .paintings-img--stan .stan-hint,
+    .paintings-img--stan .stan-credit {
+      display: none;
+    }
+  }
+
+  /* ═════════════════════════ STAN (shared between Story5 & Tools) ═════════════════════════ */
+  .stan {
+    @apply flex w-full flex-col items-center gap-4 self-center text-center;
+  }
+
+  .stan-img {
+    @apply block size-full object-cover;
+    object-position: 28% 50%;
+  }
+
+  .stan-title {
+    @apply font-vietnam text-lg text-white;
+  }
+
+  .stan-hint {
+    @apply font-mono text-[11px] tracking-widest text-white/60 uppercase;
+  }
+
+  .stan-back {
+    @apply flex size-full flex-col items-center justify-center gap-3 p-4 text-center text-red;
+    border: 3px solid var(--color-red);
+    border-radius: 19px;
+    background: var(--color-dark);
+  }
+
+  .stan-tag {
+    @apply font-mono text-[11px] font-bold tracking-widest uppercase;
+  }
+
+  .stan-num {
+    @apply flex min-h-28 items-center justify-center;
+    font-family: var(--font-effect);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .stan-since {
+    @apply font-mono text-[10px] opacity-70;
+  }
+
+  .stan-credit {
+    @apply mt-6 max-w-[36ch] self-end text-right font-mono text-xs leading-relaxed text-red;
+
+    a {
+      @apply underline decoration-1 underline-offset-4 transition-colors duration-300;
+
+      &:hover {
+        @apply text-white;
+      }
+    }
+
+    small {
+      @apply mt-2 block text-[10px] opacity-70;
+    }
+  }
+
+  .stan-scramble {
+    @apply font-bold text-red;
+  }
+
+  .story-live {
+    @apply mr-2 inline-block size-2 rounded-full bg-red align-middle;
+    animation: story-pulse 1.4s ease-in-out infinite;
+  }
+
+  .parallax-hero {
+    position: relative;
+    height: 100vh;
+    overflow: clip;
+    display: grid;
+    place-items: center;
+    background-color: #000;
+  }
+
+  .parallax-layer {
+    position: absolute;
+    inset: -12% 0;
+    display: grid;
+    place-items: center;
+    will-change: transform;
+  }
+  /* ═════════════════════════ TOOLS: black hero + red ceiling grid, then the dial and the paintings path ═════════════════════════ */
+  /* the ceiling grid, drawn from the top edge down to the horizon (HeroGrid.jsx) */
+  #tools .hero-grid {
+    position: absolute;
+    inset: 0 0 auto 0;
+    width: 100%;
+    height: clamp(11rem, 32dvh, 22rem);
+    overflow: hidden;
+    pointer-events: none;
+    filter: drop-shadow(0 0 6px rgb(255 0 0 / 0.55));
+
+    line {
+      stroke: var(--color-red);
+      stroke-width: 1.4;
+      stroke-linecap: round;
+    }
+  }
+
+  /* ═════════════════════════ TOOLS WORLD: one red grid behind the dial chapter and the paintings (Tools.jsx) ═════════════════════════ */
+  .paintings-world {
+    @apply relative w-full bg-black text-white;
+    background-image:
+      linear-gradient(rgb(255 0 0 / 0.2) 2px, transparent 2px),
+      linear-gradient(90deg, rgb(255 0 0 / 0.2) 2px, transparent 2px),
+      linear-gradient(rgb(255 0 0 / 0.09) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 0 0 / 0.09) 1px, transparent 1px);
+    background-size:
+      100px 100px,
+      100px 100px,
+      20px 20px,
+      20px 20px;
+    background-position:
+      -2px -2px,
+      -2px -2px,
+      -1px -1px,
+      -1px -1px;
+  }
+
+  /* ═════════════════════════ TOOLS DIAL (ToolsDial.jsx): the skills circle travels from the middle of the screen to the left ═════════════════════════ */
+  .dial {
+    @apply relative w-full;
+    height: 100vh;
+    height: 100svh;
+  }
+
+  .dial-stage {
+    --cx: -3vw; /* where the dial's centre sits once it is docked on the left */
+    --cy: 50%;
+    --tile: clamp(4.25rem, 6vw, 5.75rem);
+    --step: 24deg; /* keep in sync with STEP in ToolsDial.jsx */
+    @apply relative size-full overflow-hidden;
+
+    @media (max-width: 1023px) {
+      --cx: -14vw;
+      --cy: 28%;
+      --tile: 3.5rem;
+    }
+  }
+
+  /* zero-size anchor at the dial's centre: GSAP moves it, --r is the live radius, --k spreads the tools from a full ring (0) to the docked step (1) */
+  .dial-wheel {
+    --r: 20rem;
+    --k: 0;
+    --full: calc(360deg / var(--n, 8));
+    --ro: calc(var(--r) - var(--tile) * 0.95);
+    @apply absolute size-0;
+    left: var(--cx);
+    top: var(--cy);
+    will-change: transform;
+  }
+
+  .dial-orbit {
+    @apply pointer-events-none absolute rounded-full border-2;
+    border-color: rgb(255 255 255 / 0.18);
+    width: calc(var(--ro) * 2);
+    height: calc(var(--ro) * 2);
+    left: calc(var(--ro) * -1);
+    top: calc(var(--ro) * -1);
+  }
+
+  .dial-orbit--inner {
+    border: 1px dashed rgb(255 0 0 / 0.5);
+    width: calc(var(--ro) * 1.5);
+    height: calc(var(--ro) * 1.5);
+    left: calc(var(--ro) * -0.75);
+    top: calc(var(--ro) * -0.75);
+  }
+
+  /* pointer: a line from the left edge to the rim, a ring at its end, a red needle on the rim */
+  .dial-line {
+    @apply pointer-events-none absolute;
+    left: -100vw;
+    top: -1px;
+    width: calc(100vw + var(--ro) - 2.4rem);
+    height: 2px;
+    background: rgb(255 255 255 / 0.75);
+    visibility: hidden;
+  }
+
+  .dial-pin {
+    @apply pointer-events-none absolute size-3.5 rounded-full border-2 border-red bg-black;
+    left: calc(var(--ro) - 2.4rem - 7px);
+    top: -7px;
+    visibility: hidden;
+  }
+
+  .dial-needle {
+    @apply pointer-events-none absolute bg-red;
+    left: calc(var(--ro) - 4px);
+    top: -1.5px;
+    width: 1.6rem;
+    height: 3px;
+    box-shadow: 0 0 10px rgb(255 0 0 / 0.7);
+    visibility: hidden;
+  }
+
+  .dial-ring {
+    @apply absolute size-0;
+    transform-origin: 0 0;
+  }
+
+  .dial-ticks {
+    @apply absolute size-0;
+    visibility: hidden;
+  }
+
+  .dial-tick {
+    --a: calc(var(--j) * 6deg);
+    @apply absolute block;
+    left: 0;
+    top: -1px;
+    width: 9px;
+    height: 2px;
+    background: rgb(255 255 255 / 0.3);
+    transform-origin: 0 50%;
+    transform: rotate(var(--a)) translateX(var(--ro));
+  }
+
+  .dial-tick--major {
+    width: 16px;
+    background: rgb(255 255 255 / 0.7);
+  }
+
+  /* each tool sits on the rim; it tilts with the ring and stands upright when it reaches 3 o'clock */
+  .dial-item {
+    --a: calc(
+      var(--i) * (var(--full) + (var(--step) - var(--full)) * var(--k))
+    );
+    @apply absolute;
+    left: 0;
+    top: 0;
+    width: var(--tile);
+    height: var(--tile);
+    margin: calc(var(--tile) / -2) 0 0 calc(var(--tile) / -2);
+    transform: rotate(var(--a)) translateX(var(--r));
+  }
+
+  .dial-face {
+    @apply relative grid size-full place-items-center rounded-full border-2 border-red bg-white text-dark;
+    padding: 18%;
+    transition:
+      transform 0.35s ease,
+      box-shadow 0.35s ease;
+
+    img {
+      @apply relative z-10 block size-full object-contain;
+      pointer-events: none;
+    }
+  }
+
+  .dial-mono {
+    @apply absolute inset-0 grid place-items-center font-mono font-bold;
+    font-size: clamp(0.9rem, 1.2vw, 1.15rem);
+  }
+
+  .dial-item.is-active .dial-face {
+    transform: scale(1.22);
+    box-shadow:
+      0 0 0 3px #000,
+      0 0 0 6px var(--color-red);
+  }
+
+  /* what sits inside the ring while it is still in the middle of the screen */
+  .dial-center {
+    @apply pointer-events-none absolute flex flex-col items-center gap-3 text-center;
+    left: 0;
+    top: 0;
+    translate: -50% -50%;
+    width: min(20rem, calc(var(--ro) * 1.2));
+  }
+
+  .dial-center-kicker {
+    @apply font-mono text-xs font-bold tracking-widest text-red uppercase;
+  }
+
+  .dial-center-quote {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2.6vw, 2.5rem);
+    line-height: 1.05;
+    color: #fff;
+
+    @media (max-width: 1023px) {
+      display: none;
+    }
+  }
+
+  .dial-hint {
+    @apply pointer-events-none absolute bottom-10 left-1/2 font-mono text-xs font-bold tracking-widest text-white/70 uppercase;
+    translate: -50% 0;
+  }
+
+  /* right side: one block of text per tool, all stacked in the same spot */
+  .dial-copy {
+    @apply absolute grid;
+    left: 52%;
+    right: 6vw;
+    top: 50%;
+    translate: 0 -50%;
+
+    @media (max-width: 1023px) {
+      left: 1.25rem;
+      right: 1.25rem;
+      top: 58%;
+      translate: none;
+    }
+  }
+
+  .dial-slide {
+    @apply invisible flex flex-col items-start gap-5 opacity-0;
+    grid-area: 1 / 1;
+  }
+
+  .dial-meta {
+    @apply flex items-center gap-3;
+  }
+
+  .dial-chip {
+    @apply rounded-md bg-red px-2.5 py-1 font-mono text-xs font-bold text-black;
+  }
+
+  .dial-name {
+    @apply font-mono text-xs tracking-widest text-white/70 uppercase;
+  }
+
+  .dial-title {
+    font-family: var(--font-effect);
+    font-weight: 700;
+    font-size: clamp(2.25rem, 5vw, 5.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    max-width: 12em;
+    color: #fff;
+    text-wrap: balance;
+  }
+
+  .dial-text {
+    @apply font-vietnam;
+    max-width: 36ch;
+    font-size: clamp(0.95rem, 1.2vw, 1.15rem);
+    line-height: 1.6;
+    color: rgb(255 255 255 / 0.8);
+  }
+
+  /* bottom: 01 to 08 stepper and the "up next" label */
+  .dial-dock {
+    @apply absolute flex flex-col items-start gap-4;
+    left: 52%;
+    bottom: 3rem;
+    visibility: hidden;
+
+    @media (max-width: 1023px) {
+      left: 1.25rem;
+      bottom: 1.5rem;
+    }
+  }
+
+  .dial-steps {
+    @apply m-0 flex list-none items-center p-0;
+  }
+
+  .dial-step {
+    @apply relative grid size-8 place-items-center rounded-md border-2 bg-black font-mono text-xs font-bold;
+    border-color: rgb(255 0 0 / 0.4);
+    color: rgb(255 0 0 / 0.6);
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease;
+
+    @media (max-width: 1023px) {
+      @apply size-6 text-[10px];
+    }
+
+    & + & {
+      margin-left: 1.1rem;
+
+      @media (max-width: 1023px) {
+        margin-left: 0.6rem;
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        width: 1.1rem;
+        height: 2px;
+        margin-top: -1px;
+        background: rgb(255 0 0 / 0.35);
+
+        @media (max-width: 1023px) {
+          width: 0.6rem;
         }
       }
     }
 
-    /* ─────────────── StorySwap: red bars sweep across, red gives way to dark ─────────────── */
-    .story-swap {
-      @apply relative h-dvh w-full overflow-hidden bg-dark;
+    &.is-past {
+      border-color: var(--color-red);
+      color: var(--color-red);
+    }
+
+    &.is-current {
+      border-color: var(--color-red);
+      background: var(--color-red);
+      color: #000;
+    }
+  }
+
+  .dial-next {
+    @apply m-0 font-mono text-xs tracking-widest text-white/60 uppercase;
+
+    b {
+      @apply ml-2 font-bold text-white;
+    }
+  }
+
+  /* reduced motion: no pin, no dial. Every tool is simply listed */
+  @media (prefers-reduced-motion: reduce) {
+    .dial {
+      height: auto;
+    }
+
+    .dial-stage {
+      height: auto;
+      padding: 6rem 1.25rem;
+    }
+
+    .dial-wheel,
+    .dial-hint,
+    .dial-dock {
+      display: none;
+    }
+
+    .dial-copy {
+      position: static;
+      display: flex;
+      flex-direction: column;
+      gap: 3.5rem;
+      translate: none;
+    }
+
+    .dial-slide {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
+  /* ═════════════════════════ PAINTINGS & NAPOLEON EDITORIAL GRID (Tools.jsx) ═════════════════════════ */
+  #paintings {
+    @apply relative w-full overflow-hidden;
+    height: 410svh;
+
+    .paintings-svg {
+      @apply pointer-events-none absolute inset-0 z-[1] size-full overflow-visible;
+    }
+
+    .paintings-route {
+      fill: none;
+      stroke: rgb(255 0 0 / 0.35);
+      stroke-width: 2;
+      stroke-dasharray: 3 10;
+      stroke-linecap: round;
+    }
+
+    .paintings-seg {
+      fill: none;
+      stroke: var(--color-red);
+      stroke-width: 3;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 6px rgb(255 0 0 / 0.7));
+    }
+
+    .paintings-head {
+      @apply pointer-events-none absolute top-0 left-0 z-[3] size-3.5 rounded-full bg-red opacity-0;
+      margin: -7px 0 0 -7px;
+      box-shadow:
+        0 0 0 6px rgb(255 0 0 / 0.25),
+        0 0 18px 4px rgb(255 0 0 / 0.7);
+    }
+
+    .paintings-point {
+      @apply absolute z-[2] m-0 size-0;
+    }
+
+    .paintings-box {
+      @apply absolute top-1/2 left-1/2 flex items-center justify-center overflow-hidden border-2 border-red bg-red;
+      width: 4.5rem;
+      height: 4.5rem;
+      translate: -50% -50%;
+    }
+
+    .paintings-letter {
+      @apply font-mono text-2xl font-bold text-black;
+    }
+
+    .paintings-fallback {
+      @apply absolute inset-x-0 bottom-0 p-3 text-center font-mono text-xs font-bold text-black uppercase opacity-0;
+    }
+
+    .paintings-img {
+      @apply absolute inset-0 size-full object-cover opacity-0 transition-transform duration-500 ease-out;
+    }
+
+    /* ── 01: Accolade -> Red-tinted surface with black "The craft", reveals image on hover ── */
+    .paintings-box--accolade {
+      cursor: pointer;
+
+      .accolade-veil {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        display: grid;
+        place-items: center;
+        padding: 1rem;
+        background: rgba(255, 0, 0, 0.85);
+        transition:
+          opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .accolade-veil-label {
+        font-family: var(--font-effect);
+        font-weight: 700;
+        font-size: clamp(1.5rem, 3.2vw, 2.85rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        color: #000;
+        text-align: center;
+      }
+
+      &:hover .accolade-veil {
+        opacity: 0;
+        transform: scale(1.06);
+        pointer-events: none;
+      }
+
+      &:hover .paintings-img {
+        transform: scale(1.04);
+      }
+    }
+
+    /* ── 02: Napoleon -> the node stays a numbered marker, the red-lined editorial grid sits beside it ── */
+    .paintings-box--napoleon {
       z-index: 3;
     }
 
-    .story-bar {
-      @apply block w-full will-change-transform;
-      height: 1.2dvh;
-      margin-bottom: -0.2dvh;
-      background: var(--color-red);
+    .napoleon-editorial {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: min(calc(82vw - 5rem), 74rem);
+      translate: 3.75rem -50%;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      border: 2px solid var(--color-red);
+      background: #000;
     }
 
-    /* the swap's text sits in the middle; the bars sweep under it */
-    .story-swap-text {
-      @apply absolute inset-0 z-10 flex flex-wrap items-center justify-center gap-x-4 px-5 text-center text-white;
+    .napoleon-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      border-bottom: 2px solid var(--color-red);
+
+      @media (min-width: 1024px) {
+        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+      }
+    }
+
+    .napoleon-cell {
+      padding: clamp(1.25rem, 2.5vw, 2.25rem);
+      border-bottom: 2px solid var(--color-red);
+
+      @media (min-width: 1024px) {
+        border-bottom: none;
+        border-right: 2px solid var(--color-red);
+
+        &:last-child {
+          border-right: none;
+        }
+      }
+    }
+
+    .napoleon-cell--lead {
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    /* the one Napoleon painting: fills the red cell */
+    .napoleon-cell--pillars {
+      position: relative;
+      min-height: 16rem;
+      background: var(--color-red);
+      color: #000;
+      padding: 0;
+    }
+
+    .napoleon-photo {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .napoleon-pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      height: 100%;
+    }
+
+    .napoleon-pillar {
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.75rem;
+      border-right: 1px solid var(--color-red);
+      border-bottom: 1px solid var(--color-red);
+
+      &:nth-child(2n) {
+        border-right: none;
+      }
+
+      &:nth-last-child(-n + 2) {
+        border-bottom: none;
+      }
+
+      p {
+        font-family: var(--font-vietnam);
+        font-size: 0.8rem;
+        line-height: 1.45;
+      }
+    }
+
+    .napoleon-pillar--red {
+      background: var(--color-red);
+      color: #000;
+      border-color: #000;
+    }
+
+    .napoleon-pillar--black {
+      background: #000;
+      color: var(--color-red);
+      border-color: var(--color-red);
+
+      p {
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+
+    .napoleon-pillar-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+
+    .napoleon-pillar-icon {
+      width: 3rem;
+      height: 3rem;
+      object-fit: contain;
+      align-self: center;
+      padding: 0.35rem;
+      border-radius: 9999px;
+      background: #fff;
+    }
+
+    .napoleon-heading {
       font-family: var(--font-effect);
       font-weight: 700;
-      font-size: clamp(2rem, 6vw, 6rem);
-      line-height: 1.05;
+      font-size: clamp(1.85rem, 3.6vw, 3.25rem);
+      line-height: 0.96;
       letter-spacing: -0.04em;
+      color: #fff;
     }
 
-    .story-i {
-      @apply text-red;
-      font-size: 1.5em;
-      line-height: 0.8;
+    .napoleon-lead {
+      max-width: 38ch;
+      font-family: var(--font-vietnam);
+      font-size: clamp(0.9rem, 1.15vw, 1.05rem);
+      line-height: 1.55;
+      color: rgba(255, 255, 255, 0.86);
     }
 
-    /* ─────────────── Story5: Stańczyk (flip card and framed portrait) ─────────────── */
-    .story-beat--stan {
-      @apply grid items-center gap-10 text-left lg:grid-cols-[1fr_auto] lg:gap-[6vw];
-      z-index: 2;
+    /* ── 3D Draggable Carousel ("The Creative Process") ── */
+    .creative-process-wrap {
+      padding: 1.5rem clamp(1rem, 2.5vw, 2.25rem) 2.5rem;
+      overflow: hidden;
+
+      .titles {
+        color: var(--color-red);
+        font-family: var(--font-effect);
+        font-weight: 700;
+        font-size: clamp(1.75rem, 3vw, 2.75rem);
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+
+      .demoWrapper {
+        position: relative;
+        width: 100%;
+        max-width: 680px;
+        height: 340px;
+        -webkit-font-smoothing: antialiased;
+        margin: 24px auto 48px;
+        perspective: 1100px;
+        transform-style: preserve-3d;
+        cursor: grab;
+        user-select: none;
+
+        &:active {
+          cursor: grabbing;
+        }
+      }
+
+      .box {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 190px;
+        height: 290px;
+        margin-left: -95px;
+        overflow: hidden;
+        border-radius: 12px;
+      }
+
+      .creative-pro {
+        border: 1px solid var(--color-red);
+        color: #fff;
+        background: rgba(17, 19, 20, 0.96);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+
+        .card-img-top {
+          width: 3.25rem;
+          height: 3.25rem;
+          object-fit: contain;
+          margin: 1.1rem auto 0;
+          padding: 0.45rem;
+          border-radius: 9999px;
+          background: #fff;
+        }
+
+        .card-body {
+          padding: 1rem 1.1rem;
+          font-family: var(--font-mono);
+          font-weight: 700;
+          font-size: 0.95rem;
+          color: var(--color-red);
+        }
+
+        .card-clr {
+          font-family: var(--font-vietnam);
+          font-weight: 400;
+          font-size: 0.76rem;
+          line-height: 1.45;
+          color: rgba(255, 255, 255, 0.82);
+        }
+
+        &:hover {
+          cursor: grab;
+          box-shadow:
+            0 4px 8px 0 var(--color-red),
+            0 6px 20px 0 rgba(255, 0, 0, 0.55);
+        }
+      }
     }
 
-    .story-stan-frame {
-      @apply relative w-full border-l-2 border-red bg-black p-4 lg:w-[min(40vw,28rem)] lg:justify-self-end;
-    }
-
-    .stan {
-      @apply flex w-full flex-col items-center gap-4 self-center text-center;
-    }
-
-    .stan-img {
-      @apply block size-full object-cover;
-      /* the painting is landscape: this keeps Stańczyk in the square crop */
-      object-position: 28% 50%;
-    }
-
-    .stan-title {
-      @apply font-vietnam text-lg text-white;
-    }
-
-    .stan-hint {
-      @apply font-mono text-[11px] tracking-widest text-white/60 uppercase;
-    }
-
-    /* back of the card: red border, live counter */
-    .stan-back {
-      @apply flex size-full flex-col items-center justify-center gap-3 p-4 text-center text-red;
-      border: 3px solid var(--color-red);
-      border-radius: 19px;
+    /* ── 03: Stańczyk -> the Stan card is the portrait; its own captions stay out of the fixed-size frame ── */
+    .paintings-img--stan {
+      display: flex;
+      justify-content: center;
       background: var(--color-dark);
+
+      .stan {
+        height: 100%;
+        max-width: none;
+        gap: 0;
+        align-self: stretch;
+      }
+
+      .stan-title,
+      .stan-hint,
+      .stan-credit {
+        display: none;
+      }
     }
 
-    .stan-tag {
-      @apply font-mono text-[11px] font-bold tracking-widest uppercase;
+    /* ── Right-side captions for Accolade (01) and Stańczyk (03) ── */
+    .paintings-cap {
+      @apply absolute flex flex-col opacity-0;
+      top: 50%;
+      left: calc(var(--frame-w, 20rem) / 2 + clamp(1.5rem, 3vw, 3rem));
+      width: min(56vw, 46rem);
+      translate: 0 -50%;
     }
 
-    .stan-num {
-      @apply flex min-h-28 items-center justify-center;
+    .paintings-copy {
+      @apply flex flex-col gap-2;
+      max-width: 34rem;
+    }
+
+    .paintings-kicker {
+      @apply font-mono text-xs font-bold tracking-widest text-red uppercase;
+    }
+
+    .paintings-cap strong {
       font-family: var(--font-effect);
+      font-weight: 700;
+      font-size: clamp(2rem, 3.6vw, 3.75rem);
+      line-height: 0.98;
       letter-spacing: -0.04em;
-      line-height: 1;
     }
 
-    .stan-since {
-      @apply font-mono text-[10px] opacity-70;
+    .paintings-by {
+      @apply font-mono text-[11px] text-white/60;
     }
 
-    /* bottom right: the sentence + the painter's credit */
-    .stan-credit {
-      @apply mt-6 max-w-[36ch] self-end text-right font-mono text-xs leading-relaxed text-red;
+    .paintings-cap p {
+      @apply font-vietnam text-sm leading-relaxed text-white/85 md:text-base;
+    }
 
-      a {
-        @apply underline decoration-1 underline-offset-4 transition-colors duration-300;
+    .paintings-cap p + p {
+      margin-top: 0.5rem;
+    }
 
-        &:hover {
-          @apply text-white;
-        }
+    @media (max-width: 1023px) {
+      height: 490svh;
+
+      .napoleon-editorial {
+        top: 3.5rem;
+        left: 0;
+        translate: -50% 0;
+        width: min(94vw, 34rem);
       }
 
-      small {
-        @apply mt-2 block text-[10px] opacity-70;
-      }
-    }
-
-    .stan-scramble {
-      @apply font-bold text-red;
-    }
-
-    /* blinking red dot before a label */
-    .story-live {
-      @apply mr-2 inline-block size-2 rounded-full bg-red align-middle;
-      animation: story-pulse 1.4s ease-in-out infinite;
-    }
-
-    /* ─────────────── Story6: the toolbox (lead, years, skills ring, tool lists) ─────────────── */
-    .story-beat--tools {
-      @apply lg:grid lg:grid-cols-[1.35fr_1fr] lg:content-center lg:items-start lg:gap-x-[6vw];
-      z-index: 1;
-    }
-
-    .story-tools-lead {
-      @apply flex flex-col gap-6;
-    }
-
-    .story-side {
-      @apply flex flex-col gap-10;
-    }
-
-    /* years of experience */
-    .story-years {
-      @apply flex flex-col gap-2 text-white;
-    }
-
-    .story-years-row {
-      @apply flex items-end gap-4;
-    }
-
-    .story-years-num {
-      @apply flex min-h-24 items-center md:min-h-40;
-      font-family: var(--font-effect);
-      letter-spacing: -0.04em;
-      line-height: 1;
-    }
-
-    .story-years-label {
-      @apply pb-3 font-mono text-xs font-bold uppercase md:text-sm;
-    }
-
-    /* tool lists */
-    .story-tools {
-      @apply flex flex-col gap-8;
-    }
-
-    .story-tools-group {
-      @apply flex flex-col gap-3;
-
-      h3 {
-        @apply font-mono text-xs font-bold tracking-widest uppercase md:text-sm;
+      .paintings-cap {
+        top: calc(var(--frame-h, 20rem) / 2 + 1.25rem);
+        left: 0;
+        translate: -50% 0;
+        width: min(90vw, 28rem);
+        align-items: center;
+        text-align: center;
       }
 
-      ul {
-        @apply flex list-none flex-wrap gap-2;
+      .paintings-copy {
+        align-items: center;
       }
-
-      li {
-        @apply cursor-default rounded-full border-2 border-dark px-4 py-1.5 font-mono text-sm font-bold transition-colors duration-300;
-
-        &:hover {
-          @apply bg-dark text-red;
-        }
-      }
-    }
-
-    /* skills ring (Skills.jsx) */
-    .skills {
-      --ring: min(30vw, 22rem);
-      --item: calc(var(--ring) * 0.2);
-      @apply relative mx-auto flex-none;
-      width: var(--ring);
-      height: var(--ring);
-    }
-
-    .skills-ring {
-      @apply absolute inset-0 cursor-grab select-none;
-
-      &:active {
-        @apply cursor-grabbing;
-      }
-    }
-
-    .skills-path {
-      @apply pointer-events-none size-full overflow-visible;
-
-      circle {
-        fill: none;
-        stroke: var(--color-dark);
-        stroke-width: 2;
-        stroke-dasharray: 2 10;
-        stroke-linecap: round;
-        vector-effect: non-scaling-stroke;
-      }
-    }
-
-    /* each logo sits on the circle at --a; the last rotate cancels the ring's spin so it stays upright */
-    .skills-item {
-      @apply absolute top-1/2 left-1/2;
-      width: var(--item);
-      height: var(--item);
-      margin: calc(var(--item) / -2) 0 0 calc(var(--item) / -2);
-      transform: rotate(var(--a)) translateY(calc(var(--ring) / -2))
-        rotate(calc(var(--a) * -1 - var(--spin, 0deg)));
-    }
-
-    .skills-badge {
-      @apply size-full;
-    }
-
-    .skills-face {
-      @apply relative grid size-full place-items-center rounded-full border-2 border-dark bg-white p-[18%] text-dark;
-      transition:
-        transform 0.35s ease,
-        box-shadow 0.35s ease;
-
-      img {
-        @apply pointer-events-none relative z-10 size-full object-contain;
-      }
-    }
-
-    /* shows until the logo file exists */
-    .skills-fallback {
-      @apply absolute inset-0 grid place-items-center font-mono text-[10px] font-bold;
-    }
-
-    /* the logo at the top of the ring */
-    .skills-item.is-active .skills-face {
-      transform: scale(1.22);
-      box-shadow:
-        0 0 0 3px var(--color-red),
-        0 0 0 6px var(--color-dark);
-    }
-
-    .skills-center {
-      @apply pointer-events-none absolute inset-0 grid place-content-center gap-2 text-center;
-    }
-
-    .skills-name {
-      @apply text-dark;
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: clamp(1.5rem, 2.6vw, 2.5rem);
-      line-height: 1;
-    }
-
-    .skills-hint {
-      @apply font-mono text-[11px] tracking-widest text-dark/70 uppercase;
     }
   }
-  /* ═════════════════════════ WORK / PROJECTS (includes the finale) ═════════════════════════ */
+
+  /* ═════════════════════════ SKILLS RING (Skills.jsx) ═════════════════════════ */
+  .skills {
+    --ring: min(68vw, 20rem);
+    --item: calc(var(--ring) * 0.21);
+    position: relative;
+    flex: none;
+    margin-inline: auto;
+    width: var(--ring);
+    height: var(--ring);
+
+    @media (min-width: 1024px) {
+      --ring: min(23vw, 22rem);
+    }
+  }
+
+  .skills-ring {
+    position: absolute;
+    inset: 0;
+    cursor: grab;
+    user-select: none;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  .skills-path {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+
+    circle {
+      fill: none;
+      stroke: var(--color-red);
+      stroke-width: 2;
+      stroke-dasharray: 2 10;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+  }
+
+  .skills-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--item);
+    height: var(--item);
+    margin: calc(var(--item) / -2) 0 0 calc(var(--item) / -2);
+    transform: rotate(var(--a)) translateY(calc(var(--ring) / -2))
+      rotate(calc(var(--a) * -1 - var(--spin, 0deg)));
+  }
+
+  .skills-badge {
+    width: 100%;
+    height: 100%;
+  }
+
+  .skills-face {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 18%;
+    border: 2px solid var(--color-red);
+    border-radius: 9999px;
+    background: #fff;
+    color: var(--color-dark);
+    transition:
+      transform 0.35s ease,
+      box-shadow 0.35s ease;
+
+    img {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+  }
+
+  .skills-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .skills-item.is-active .skills-face {
+    transform: scale(1.22);
+    box-shadow:
+      0 0 0 3px #000,
+      0 0 0 6px var(--color-red);
+  }
+
+  .skills-center {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 0.45rem;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .skills-name {
+    color: #fff;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1.5rem, 2.4vw, 2.35rem);
+    line-height: 1;
+  }
+
+  .skills-hint {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-red);
+  }
+
+  /* ═════════════════════════ ART (Art.jsx: the moving parts inside the Tools cells) ═════════════════════════ */
+  .art {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    container-type: size;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .art-char {
+    display: inline-block;
+  }
+
+  /* ── Pattern: rotated rows, a red and a blue ink that multiply where they overlap ── */
+  .art-pattern {
+    --paper: #dbe0cf;
+    --ink-a: var(--color-red);
+    --ink-b: #019ac5;
+    --art-rot: -25deg;
+    background: var(--paper);
+    font-family: var(--font-effect);
+  }
+
+  .art-pattern__content {
+    position: absolute;
+    top: -15%;
+    left: 5%;
+    width: 130%;
+    font-size: 19cqmin;
+    font-weight: 600;
+    line-height: 0.8;
+    rotate: var(--art-rot);
+    transform-origin: 50% 50%;
+  }
+
+  .art-pattern__band {
+    position: relative;
+    height: 0.76em;
+    margin: 0;
+  }
+
+  .art-pattern__names {
+    display: block;
+    position: relative;
+    width: 150%;
+    height: 0.89em;
+    overflow: hidden;
+    will-change: transform;
+  }
+
+  .art-pattern__name {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    white-space: nowrap;
+    color: var(--ink-a);
+    mix-blend-mode: multiply;
+  }
+
+  .art-pattern__name--blue {
+    top: 0.06em;
+    color: var(--ink-b);
+  }
+
+  .art-pattern__caption {
+    position: absolute;
+    bottom: 3%;
+    z-index: 2;
+    margin: 0;
+    color: var(--ink-a);
+    font-family: var(--font-effect);
+    font-weight: 600;
+    font-size: max(10px, 2.4cqmin);
+    line-height: 1.3;
+
+    span {
+      display: block;
+    }
+  }
+
+  /* ── Random: letters stacked in one grid cell, moved by GSAP ── */
+  .art-random {
+    background: #000;
+    color: var(--color-red);
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+
+  .art-random__field {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: var(--art-fs, 1rem);
+    line-height: 1;
+  }
+
+  .art-random__field > * {
+    grid-area: 1 / 1 / -1 / -1;
+  }
+
+  .art-random__char {
+    opacity: 0;
+    will-change: transform, opacity;
+
+    &.is-seed {
+      opacity: 1;
+    }
+  }
+
+  /* ── Question: masked lines of display type ── */
+  .art-question {
+    margin: 0;
+    font-family: var(--font-effect);
+    font-weight: 500;
+    font-size: clamp(2.25rem, 9vw, 3.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+  }
+
+  .art-question__line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+
+    > span {
+      display: block;
+    }
+  }
+
+  /* ═════════════════════════ WORK / PROJECTS (stacked cards + finale) ═════════════════════════ */
   #work {
     @apply relative z-0 w-full bg-red text-dark;
 
@@ -964,25 +1797,9 @@ html.is-locked {
       }
     }
 
-    /* default (mobile / reduced motion): stacked */
-    .work-pin {
-      @apply relative w-full;
-    }
-
-    .work-track {
-      @apply flex flex-col gap-28 px-5 py-24;
-    }
-
-    .work-panel {
-      @apply relative flex flex-col gap-8;
-    }
-
-    .work-panel--intro {
-      @apply gap-3 py-16;
-    }
-
-    .work-panel--outro {
-      @apply gap-4 bg-dark py-16;
+    /* ── intro ── */
+    .work-intro {
+      @apply flex flex-col items-start gap-3 px-5 pt-28 pb-14 lg:px-[6vw] lg:pb-20;
     }
 
     .work-title {
@@ -1001,13 +1818,6 @@ html.is-locked {
       -webkit-text-stroke: 2px var(--color-dark);
     }
 
-    .work-count {
-      @apply align-top font-mono text-base font-normal md:text-2xl;
-      letter-spacing: 0;
-      color: var(--color-dark);
-      -webkit-text-stroke: 0;
-    }
-
     .work-sub {
       @apply font-hand text-4xl leading-none md:text-6xl;
     }
@@ -1016,43 +1826,51 @@ html.is-locked {
       @apply font-mono text-sm;
     }
 
-    .work-more {
-      @apply font-mono text-3xl font-bold md:text-6xl;
-      letter-spacing: -0.04em;
+    /* ── the stack: cards pin at the same spot, GSAP (Projects.jsx) scales/blurs the ones underneath ── */
+    .work-stack {
+      @apply mx-auto flex w-full max-w-[96rem] flex-col px-5 lg:px-[6vw];
+      gap: clamp(1.5rem, 6dvh, 4rem);
+      padding-bottom: clamp(1.5rem, 6dvh, 4rem);
     }
 
-    .work-progress {
-      @apply absolute bottom-0 left-0 hidden h-1.5 w-full bg-dark/20;
+    /* the card is what gets pinned; the inner is what gets scaled, so the two never fight over transform */
+    .proj-card {
+      @apply relative z-[1];
     }
 
-    .work-progress-bar {
-      @apply block h-full w-full origin-left bg-dark;
-      transform: scaleX(0);
-    }
-
-    /* project text */
-    .proj-text {
-      @apply relative z-10 flex flex-col items-start gap-5;
+    .proj-card-inner {
+      @apply relative flex flex-col gap-4 border-2 border-dark bg-red p-4 md:gap-5 md:p-6;
+      box-shadow: 8px 8px 0 var(--color-dark);
+      transform-origin: 50% 0;
+      will-change: transform, filter;
     }
 
     .proj-meta {
       @apply flex w-full items-center justify-between gap-6 border-b-2 border-dark pb-3 font-mono text-xs md:text-sm;
     }
 
+    .proj-card-body {
+      @apply grid grid-cols-1 items-center gap-4 md:gap-6;
+    }
+
+    .proj-text {
+      @apply relative z-10 flex flex-col items-start gap-4 md:gap-5;
+    }
+
     .proj-name {
       @apply font-mono font-bold;
-      font-size: clamp(2.25rem, 11vw, 4rem);
+      font-size: clamp(1.75rem, 8vw, 3rem);
       line-height: 0.9;
       letter-spacing: -0.05em;
       overflow-wrap: anywhere;
 
       @media (min-width: 1024px) {
-        font-size: clamp(2rem, 3.6vw, 5.5rem);
+        font-size: clamp(2rem, 3.2vw, 4rem);
       }
     }
 
     .proj-blurb {
-      @apply max-w-[40ch] font-vietnam text-sm leading-relaxed;
+      @apply max-w-[40ch] font-vietnam text-[13px] leading-relaxed md:text-sm;
     }
 
     .proj-tags {
@@ -1063,19 +1881,8 @@ html.is-locked {
       }
     }
 
-    .proj-index {
-      @apply pointer-events-none absolute z-0 font-mono font-bold select-none;
-      right: 0;
-      top: -1rem;
-      font-size: clamp(8rem, 30vw, 14rem);
-      line-height: 0.8;
-      letter-spacing: -0.06em;
-      color: transparent;
-      -webkit-text-stroke: 2px rgba(17, 19, 20, 0.25);
-    }
-
     .proj-visit {
-      @apply inline-flex items-center gap-3 rounded-full border-2 border-dark bg-dark px-8 py-4 font-mono text-sm font-bold text-red md:text-base;
+      @apply inline-flex items-center gap-3 rounded-full border-2 border-dark bg-dark px-6 py-3 font-mono text-sm font-bold text-red md:px-8 md:py-4 md:text-base;
 
       span {
         transition: transform 0.3s ease;
@@ -1088,9 +1895,14 @@ html.is-locked {
           transform: translate(4px, -4px);
         }
       }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-dark);
+        outline-offset: 4px;
+      }
     }
 
-    /* browser mockup */
+    /* ── browser mockup ── */
     .proj-mock {
       @apply relative z-10 block w-full;
     }
@@ -1136,34 +1948,21 @@ html.is-locked {
       }
     }
 
-    .proj-fallback {
-      @apply absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center font-mono text-red;
-
-      span {
-        @apply font-bold;
-        font-size: clamp(1.5rem, 4vw, 4rem);
-        letter-spacing: -0.05em;
-      }
-
-      small {
-        @apply text-[10px] opacity-70;
-      }
-    }
-
-    /* lab (personal experiments) */
+    /* ── lab card (three tiles instead of a screenshot) ── */
     .proj-lab {
-      @apply grid grid-cols-1 gap-3 bg-black p-3 md:grid-cols-3 lg:aspect-[16/10];
+      @apply grid grid-cols-3 gap-2 bg-black p-2 md:gap-3 md:p-3 lg:aspect-[16/10];
     }
 
     .proj-tile {
-      @apply flex flex-col justify-between gap-6 border-2 border-red bg-black p-5 font-mono text-red transition-colors duration-300;
+      @apply flex flex-col justify-between gap-3 border-2 border-red bg-black p-2 font-mono text-red transition-colors duration-300 md:gap-6 md:p-5;
 
       strong {
-        @apply block text-base md:text-lg;
+        @apply block text-[11px] leading-tight md:text-base md:leading-normal lg:text-lg;
+        overflow-wrap: anywhere;
       }
 
       small {
-        @apply mt-1 block text-xs opacity-80;
+        @apply mt-1 hidden text-xs opacity-80 md:block;
       }
 
       &:hover {
@@ -1173,10 +1972,15 @@ html.is-locked {
           transform: rotate(14deg) scale(1.1);
         }
       }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-dark);
+        outline-offset: 4px;
+      }
     }
 
     .proj-icon {
-      @apply size-20 transition-transform duration-500 ease-out lg:size-24;
+      @apply size-10 transition-transform duration-500 ease-out md:size-20 lg:size-24;
     }
 
     @media (prefers-reduced-motion: no-preference) {
@@ -1185,50 +1989,34 @@ html.is-locked {
       }
     }
 
-    /* desktop: pinned horizontal scroll */
-    @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-      .work-pin {
-        @apply h-dvh overflow-hidden;
-      }
-
-      .work-track {
-        @apply h-full w-max flex-row items-center gap-0 p-0;
-      }
-
-      .work-panel {
-        @apply h-full w-screen flex-none flex-row items-center gap-[4vw] px-[6vw] pt-28 pb-16;
-      }
-
-      .work-panel--intro,
-      .work-panel--outro {
-        @apply flex-col items-start justify-center gap-4;
-      }
-
-      .proj-text {
-        @apply w-[min(26vw,26rem)] flex-none;
-      }
-
-      .proj-mock {
-        @apply flex-none;
-        width: min(54vw, 62rem, calc((100dvh - 14rem) * 1.6));
-      }
-
-      .proj-index {
-        left: 4vw;
-        right: auto;
-        top: auto;
-        bottom: -3vw;
-        font-size: 26vw;
-      }
-
-      .work-progress {
-        @apply block;
+    /* phones: shorter screenshot so a whole card fits the viewport while it's pinned */
+    @media (max-width: 767px) {
+      .proj-shot {
+        aspect-ratio: 2 / 1;
       }
     }
 
-    /* ---------- FINALE: sliding color bands + outlined words (the "panels" effect) ---------- */
+    /* desktop: text left, mockup right; the mockup's height is capped so the card stays inside the viewport */
+    @media (min-width: 1024px) {
+      .proj-card-body {
+        grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+        gap: 3vw;
+      }
+
+      .proj-mock {
+        --shot-h: clamp(12rem, calc(100dvh - 19rem), 26rem);
+        width: min(100%, calc(var(--shot-h) * 1.6));
+        justify-self: end;
+      }
+    }
+
+    /* ── finale: sliding color bands + outlined words (slides over the pinned stack) ── */
     .fin {
-      @apply relative isolate overflow-hidden text-white;
+      @apply relative isolate z-20 flex min-h-dvh flex-col justify-center overflow-hidden bg-dark px-5 py-24 text-white lg:px-[6vw];
+
+      .proj-visit:focus-visible {
+        outline-color: #fff;
+      }
     }
 
     .fin-bands {
@@ -1238,14 +2026,12 @@ html.is-locked {
 
     .fin-band {
       @apply relative h-full flex-1 bg-dark;
-      /* earlier bands sit above later ones, so their streaks stay visible */
       z-index: calc(9 - var(--i));
 
       &:nth-child(2n) {
         @apply bg-red;
       }
 
-      /* the streak that trails the motion, in the next band's color */
       &::after {
         content: "";
         @apply absolute inset-y-0 left-full w-full origin-left bg-red;
@@ -1273,7 +2059,6 @@ html.is-locked {
       max-width: 9em;
     }
 
-    /* the real text only holds the space; the outlined copy slides up over it */
     .fin-word {
       @apply relative inline-block overflow-hidden text-transparent;
       padding: 0.04em 0.14em;
@@ -1298,7 +2083,6 @@ html.is-locked {
       }
     }
 
-    /* motion on: words wait below their line until the finale becomes active */
     &.fin-armed .fin:not(.active) .fin-word::before {
       transform: translate(-50%, 175%);
       background-position: 0 0;
@@ -1309,24 +2093,44 @@ html.is-locked {
 
   /* ═════════════════════════ CONTACT ═════════════════════════ */
   #contact {
-    @apply relative z-0 flex min-h-dvh w-full flex-col overflow-hidden bg-dark text-white;
+    position: relative;
+    z-index: 0;
+    display: flex;
+    min-height: 100dvh;
+    width: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--color-dark);
+    color: #fff;
 
     .contact-inner {
-      @apply container mx-auto flex flex-1 flex-col justify-center gap-6 px-5 py-12 lg:px-0;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+      gap: clamp(1.5rem, 3.5vh, 2.5rem);
+      width: 100%;
+      max-width: 80rem;
+      margin-inline: auto;
+      padding: clamp(2.5rem, 6vh, 4.5rem) clamp(1.25rem, 4vw, 3rem);
     }
 
-    /* ---------- headline + photo ---------- */
     .contact-top {
-      @apply grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
     .contact-copy {
-      @apply flex flex-col gap-4;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
     }
 
     .contact-title {
-      @apply font-mono font-bold select-none;
-      /* bounded by height too, so the pinned screen always fits */
+      font-family: var(--font-mono);
+      font-weight: 700;
+      user-select: none;
       font-size: clamp(3rem, min(10vw, 15dvh), 10rem);
       line-height: 0.85;
       letter-spacing: -0.06em;
@@ -1334,61 +2138,47 @@ html.is-locked {
       span {
         display: block;
       }
+
+      span:last-child {
+        color: var(--color-red);
+      }
     }
 
     .contact-sub {
-      @apply font-effect text-xl md:text-3xl;
+      font-family: var(--font-effect);
+      font-size: clamp(1.15rem, 2.4vw, 1.85rem);
       letter-spacing: -0.02em;
-      max-width: 24em;
+      max-width: 28ch;
+      color: rgb(255 255 255 / 0.88);
     }
 
-    .contact-photo {
-      @apply relative mr-2.5 justify-self-start overflow-hidden border-2 border-white bg-dark lg:justify-self-end;
-      height: clamp(9rem, 30dvh, 20rem);
-      aspect-ratio: 4 / 5;
-      box-shadow: 10px 10px 0 var(--color-red);
-      transition:
-        transform 0.5s ease,
-        box-shadow 0.5s ease;
-
-      img {
-        @apply block size-full object-cover;
-        filter: grayscale(1) contrast(1.05);
-        transition: filter 0.5s ease;
-      }
-
-      &:hover {
-        transform: translate(-6px, -6px) rotate(-0.6deg);
-        box-shadow: 16px 16px 0 var(--color-red);
-
-        img {
-          filter: none;
-        }
-      }
-    }
-
-    /* ---------- the scene: red ball, white dominos, dark ground ---------- */
     .contact-scene {
-      --r: clamp(1.4rem, 3.4vw, 2.6rem); /* ball radius */
-      --tw: clamp(0.6rem, 1.6vw, 1.1rem); /* domino width */
-      --th: clamp(3.5rem, 12vw, 7rem); /* domino height */
-      --tg: clamp(1.6rem, 4.6vw, 3.2rem); /* gap between dominos */
+      --r: clamp(1.4rem, 3.4vw, 2.5rem);
+      --tw: clamp(0.65rem, 1.5vw, 1.05rem);
+      --th: clamp(3.75rem, 11vw, 6.75rem);
+      --tg: clamp(1.65rem, 4.4vw, 3.1rem);
 
-      @apply relative flex items-end justify-end;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
       gap: var(--tg);
       height: var(--th);
-      /* room for the last domino to land inside the container */
       padding-right: calc(var(--th) * 0.95);
-      border-bottom: 2px solid rgb(255 255 255 / 0.3);
+      border-bottom: 2px solid rgb(255 255 255 / 0.32);
     }
 
     .contact-ball {
-      @apply absolute bottom-0 left-0 rounded-full will-change-transform;
+      position: absolute;
+      bottom: 0;
+      left: 0;
       width: calc(var(--r) * 2);
       aspect-ratio: 1;
+      border-radius: 9999px;
       background: var(--color-red);
+      box-shadow: 0 0 24px rgb(255 0 0 / 0.35);
+      will-change: transform;
 
-      /* a dark notch so you can see it roll */
       &::after {
         content: "";
         position: absolute;
@@ -1397,94 +2187,82 @@ html.is-locked {
         width: 22%;
         aspect-ratio: 1;
         translate: -50% 0;
-        border-radius: 50%;
+        border-radius: 9999px;
         background: var(--color-dark);
       }
     }
 
     .contact-tile {
-      @apply block flex-none bg-white will-change-transform;
+      display: block;
+      flex: none;
       width: var(--tw);
       height: var(--th);
+      border-right: 3px solid transparent;
       border-radius: 2px;
+      background: #fff;
       transform-origin: 100% 100%;
-    }
-
-    /* ---------- plus cube: spins, splits into four social tiles ---------- */
-    .contact-foot {
-      @apply mt-10 mb-16 flex justify-center gap-4;
-    }
-
-    .contact-find {
-      @apply flex items-center gap-10;
-
-      p {
-        @apply font-mono text-xs font-bold md:text-sm;
-      }
+      will-change: transform;
     }
 
     .contact-hint {
-      @apply font-mono text-xs opacity-60 md:text-sm;
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgb(255 255 255 / 0.6);
     }
 
-    .contact-cube-wrap {
-      @apply relative grid size-30 flex-none place-items-center;
-
-      /* closed: taps go to the cube (which opens it), not to a hidden link */
-      &:not(.is-open) .contact-q {
-        pointer-events: none;
-      }
+    .contact-socials {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.85rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
     }
 
-    .contact-cube {
-      @apply relative cursor-pointer will-change-transform;
-      width: 50%;
-      height: 50%;
-      border-radius: 6px;
-      background: var(--color-red);
-    }
-
-    .contact-plus-v,
-    .contact-plus-h {
-      @apply pointer-events-none absolute top-1/2 left-1/2 z-10 rounded-sm bg-white;
-      translate: -50% -50%;
-    }
-
-    .contact-plus-v {
-      width: 5px;
-      height: 50%;
-    }
-
-    .contact-plus-h {
-      width: 50%;
-      height: 5px;
-    }
-
-    .contact-quad {
-      @apply absolute inset-0 flex flex-wrap;
-    }
-
-    .contact-q {
-      @apply relative block h-1/2 w-1/2;
-      border-radius: 6px;
-      background: var(--color-red);
-      transition: background-color 0.2s ease;
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.55rem 0.9rem;
+      border: 2px solid rgb(255 255 255 / 0.22);
+      border-radius: 8px;
+      background: rgb(255 255 255 / 0.03);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        background-color 0.25s ease,
+        color 0.25s ease,
+        box-shadow 0.25s ease;
 
       &:hover,
       &:focus-visible {
-        background: #fff;
+        transform: translate(-4px, -4px);
+        border-color: var(--color-red);
+        background: var(--color-red);
+        color: #000;
+        box-shadow: 4px 4px 0 #fff;
+        outline: none;
       }
     }
 
-    /* counter-rotate so the icons stay upright inside the turned cube */
-    .contact-q-content {
-      @apply absolute inset-0 flex items-center justify-center;
-      rotate: -45deg;
+    .contact-link__icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      object-fit: contain;
+      flex: none;
     }
 
-    .contact-q-icon {
-      @apply size-6;
-      color: var(--color-dark);
+    .contact-link__label {
+      white-space: nowrap;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1496,11 +2274,8 @@ html.is-locked {
 
   /* ═════════════════════════ FOOTER ═════════════════════════ */
   #footer {
-    /* dark behind the red edge, so the dip and the bounce read against it */
     @apply relative z-10 w-full bg-dark text-dark;
 
-    /* the red shape IS the footer; overflow visible so the elastic
-       overshoot can spring above the top edge */
     .footer-wave {
       position: absolute;
       inset: 0;
@@ -1521,7 +2296,6 @@ html.is-locked {
 
     .footer-inner {
       @apply container relative z-10 mx-auto flex flex-col gap-5 px-5 pb-8 md:flex-row md:items-end md:justify-between lg:px-0;
-      /* clears the dip of the curve before it flattens */
       padding-top: clamp(4.5rem, 9vw, 6rem);
     }
 
@@ -1530,7 +2304,6 @@ html.is-locked {
 
       p {
         font-family: var(--font-serif);
-
         font-size: clamp(1.5rem, 3.2vw, 2.6rem);
         line-height: 1.1;
         letter-spacing: -0.01em;

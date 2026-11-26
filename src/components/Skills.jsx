@@ -6,15 +6,12 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(Draggable, InertiaPlugin, useGSAP);
 
-/* ───────────── edit me ─────────────
-   drop the logos in /public/images/skills/ (svg or png).
-   Until a file exists, the label shows instead.                                */
 const SKILLS = [
   { id: "unity", label: "Unity", src: "/images/skills/unity.png" },
   { id: "js", label: "JavaScript", src: "/images/skills/js.png" },
   { id: "rstudio", label: "R", src: "/images/skills/rstudio.png" },
   { id: "react", label: "React", src: "/images/skills/react.png" },
-  { id: "csharp", label: "C#", src: "/images/skills/c#.png" },
+  { id: "csharp", label: "C#", src: "/images/skills/csharp.png" },
   { id: "figma", label: "Figma", src: "/images/skills/figma.png" },
   { id: "nextjs", label: "Next.js", src: "/images/skills/nextjs.png" },
 ];
@@ -31,30 +28,78 @@ const Skills = ({ className = "" }) => {
       const items = gsap.utils.toArray(".skills-item", el);
       const n = SKILLS.length;
 
-      // keep the logos upright while the ring turns, and highlight the one at the top
+      // Updates the highlighted skill
       const sync = (rot) => {
+        if (!Number.isFinite(rot)) return;
+
         el.style.setProperty("--spin", `${rot}deg`);
+
         const idx = ((-Math.round(rot / STEP) % n) + n) % n;
+        const skill = SKILLS[idx];
+        if (!skill) return;
+
         items.forEach((item, i) =>
           item.classList.toggle("is-active", i === idx),
         );
-        name.current.textContent = SKILLS[idx].label;
+
+        name.current.textContent = skill.label;
       };
 
+      // Continuous automatic rotation
+      const spin = gsap.to(el, {
+        rotation: "+=360",
+        duration: 50,
+        ease: "none",
+        repeat: -1,
+        onUpdate() {
+          sync(gsap.getProperty(el, "rotation"));
+        },
+      });
+
+      // Drag interaction
       const [drag] = Draggable.create(el, {
         type: "rotation",
         inertia: true,
         snap: (end) => gsap.utils.snap(STEP, end),
+
+        onPressInit() {
+          spin.pause();
+        },
+
         onDrag() {
+          spin.progress((((this.rotation % 360) + 360) % 360) / 360);
           sync(this.rotation);
         },
+
         onThrowUpdate() {
+          spin.progress((((this.rotation % 360) + 360) % 360) / 360);
           sync(this.rotation);
+        },
+
+        onThrowComplete() {
+          spin.progress((((this.rotation % 360) + 360) % 360) / 360);
+
+          // Resume automatic rotation smoothly
+          spin.resume();
+
+          gsap.fromTo(
+            spin,
+            { timeScale: 0 },
+            {
+              timeScale: 1,
+              duration: 1,
+              ease: "power1.in",
+            },
+          );
         },
       });
 
       sync(0);
-      return () => drag.kill();
+
+      return () => {
+        drag.kill();
+        spin.kill();
+      };
     },
     { scope: ring },
   );
@@ -74,7 +119,6 @@ const Skills = ({ className = "" }) => {
           >
             <div className="skills-badge" title={label}>
               <div className="skills-face">
-                <span className="skills-fallback">{label}</span>
                 <img
                   src={src}
                   alt=""
@@ -93,14 +137,7 @@ const Skills = ({ className = "" }) => {
         <p className="skills-name" ref={name}>
           {SKILLS[0].label}
         </p>
-        <p className="skills-hint">[ Drag to spin ]</p>
       </div>
-
-      <ul className="sr-only">
-        {SKILLS.map(({ id, label }) => (
-          <li key={id}>{label}</li>
-        ))}
-      </ul>
     </div>
   );
 };

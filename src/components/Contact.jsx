@@ -2,94 +2,110 @@ import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CONTACT_SOCIALS } from "../../constants";
-import { whenReady } from "./stories/storyUtils";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* swap the placeholder handles for your real ones */
-const TOPPLE = 66; // final lean (deg). Parallel leaning tiles never overlap at this angle.
+const TOPPLE = 66;
 
 const Contact = () => {
   const root = useRef(null);
   const scene = useRef(null);
   const ball = useRef(null);
 
-  // fewer dominos on phones so the row fits
   const [count] = useState(() =>
-    typeof window !== "undefined" && window.innerWidth < 640 ? 6 : 10,
+    typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5,
   );
 
   useLayoutEffect(() => {
-    let mm;
-    const cancel = whenReady(() => {
-      const tiles = [...scene.current.querySelectorAll(".contact-tile")];
-      const b = ball.current;
+    const el = root.current;
+    const sc = scene.current;
+    const b = ball.current;
+    if (!el || !sc || !b) return;
 
-      // distance the ball rolls before it touches the first domino
-      const dist = () => tiles[0].offsetLeft - b.offsetWidth;
-      // rolling without slipping: angle = distance / radius
-      const roll = () => (dist() / (b.offsetWidth / 2)) * (180 / Math.PI);
+    const tiles = [...sc.querySelectorAll(".contact-tile")];
+    if (tiles.length === 0) return;
 
-      gsap.set(tiles, { transformOrigin: "100% 100%" }); // pivot on the bottom-right edge
+    const dist = () => tiles[0].offsetLeft - b.offsetWidth;
+    const roll = () => (dist() / (b.offsetWidth / 2)) * (180 / Math.PI);
 
-      mm = gsap.matchMedia();
+    gsap.set(tiles, { transformOrigin: "100% 100%" });
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const tl = gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top top",
-            end: "+=150%",
-            pin: true,
-            scrub: 0.6,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
+    const mm = gsap.matchMedia();
 
-        // 1. the red ball rolls in
-        tl.fromTo(
-          b,
-          { x: 0, rotation: 0 },
-          { x: dist, rotation: roll, duration: 4 },
-          0,
-        );
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: el,
+          start: "top top",
+          end: "+=150%",
+          pin: true,
+          scrub: 0.6,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
 
-        // 2. it clips the first domino, which sets off the chain
-        tiles.forEach((tile, i) => {
-          tl.to(
+      // 1. Red ball rolls across the track without slipping
+      tl.fromTo(
+        b,
+        { x: 0, rotation: 0 },
+        { x: dist, rotation: roll, duration: 4 },
+        0,
+      );
+
+      // 2. Chain topple with a subtle impact settle on each tile
+      tiles.forEach((tile, i) => {
+        const hitAt = 3.9 + i * 0.35;
+        tl.to(
+          tile,
+          { rotation: TOPPLE, duration: 0.55, ease: "power2.in" },
+          hitAt,
+        )
+          .to(
             tile,
-            { rotation: TOPPLE, duration: 0.7, ease: "power2.in" },
-            3.9 + i * 0.35,
+            {
+              borderColor: "#ff0000",
+              duration: 0.15,
+              ease: "none",
+            },
+            hitAt + 0.35,
+          )
+          .to(
+            tile,
+            { rotation: TOPPLE - 2, duration: 0.15, ease: "power1.out" },
+            hitAt + 0.55,
           );
-        });
       });
-
-      // reduced motion: show the finished scene, no pinning
-      mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(b, { x: dist(), rotation: roll() });
-        gsap.set(tiles, { rotation: TOPPLE });
-      });
-
-      ScrollTrigger.refresh();
     });
 
+    mm.add("(prefers-reduced-motion: reduce)", () => {
+      gsap.set(b, { x: dist(), rotation: roll() });
+      gsap.set(tiles, { rotation: TOPPLE, borderColor: "#ff0000" });
+    });
+
+    ScrollTrigger.refresh();
+    document.fonts?.ready.then(() => ScrollTrigger.refresh());
+
     return () => {
-      cancel();
-      mm?.revert();
+      mm.revert();
     };
   }, [count]);
 
   return (
-    <section id="contact" ref={root}>
+    <section id="contact" ref={root} aria-labelledby="contact-heading">
       <div className="contact-inner">
-        <h2 className="contact-title">
-          <span>Got work</span>
-          <span>for me?</span>
-        </h2>
-
-        <p className="contact-sub">Hit me up for gigs and collaboration.</p>
+        <div className="contact-top">
+          <div className="contact-copy">
+            <h2 id="contact-heading" className="contact-title">
+              <span>Got work</span>
+              <span>for me?</span>
+            </h2>
+            <p className="contact-sub">
+              Hit me up for gigs, games, web builds, and collaboration.
+            </p>
+          </div>
+        </div>
 
         <div className="contact-scene" ref={scene} aria-hidden="true">
           <div className="contact-ball" ref={ball} />
@@ -99,10 +115,10 @@ const Contact = () => {
         </div>
 
         <p className="contact-hint" aria-hidden="true">
-          Keep scrolling.
+          Keep scrolling to trigger the chain.
         </p>
 
-        <ul className=" flex-row">
+        <ul className="contact-socials">
           {CONTACT_SOCIALS.map(({ label, href, icon }) => (
             <li key={label}>
               <a
@@ -117,8 +133,9 @@ const Contact = () => {
                   alt=""
                   width="48"
                   height="48"
-                  className="size-12 object-contain"
+                  className="contact-link__icon"
                 />
+                <span className="contact-link__label">{label}</span>
               </a>
             </li>
           ))}

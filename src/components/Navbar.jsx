@@ -394,8 +394,11 @@ const Navbar = () => {
       <header id="nav" ref={bar}>
         <div className="nav-inner">
           <a href={`#${navLinks[0].id}`} className="nav-logo">
-            <img src="/images/logo.png" alt="logo" />
-            <p>Red</p>
+            <img
+              src="/images/Red.jpg"
+              alt="logo"
+              className="size-10 rounded-3xl"
+            />
           </a>
 
           <button

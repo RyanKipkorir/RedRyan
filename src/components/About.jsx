@@ -1,283 +1,294 @@
-import { useRef } from "react";
+import { useId, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
-import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
-/* ───────────── edit me ───────────── */
-const LINKS = {
-  mmu: "https://www.mmu.ac.ke/",
-  nbx: "http://localhost:5173/#", // ← swap for the live NBX URL
-  ystudios: "https://ystudios.co.ke/",
+/* drop your photo here */
+const PHOTO = "/images/about.jpg";
+/* extra viewport heights the finished scene stays pinned before the page moves on */
+const HOLD = 0.5;
+/* how far (in %) a pupil can travel */
+const LOOK = 20;
+
+/* an eye: white almond, black pupil clipped to it */
+const EYE = "M4 50Q50 2 96 50Q50 98 4 50Z";
+
+const Eye = () => {
+  const id = useId().replace(/:/g, "");
+  return (
+    <svg className="about-eye-svg" viewBox="0 20 100 60" aria-hidden="true">
+      <defs>
+        <clipPath id={`eye-clip-${id}`}>
+          <path d={EYE} />
+        </clipPath>
+      </defs>
+      <g className="about-eye">
+        <path d={EYE} fill="#ffffff" />
+        <g clipPath={`url(#eye-clip-${id})`}>
+          <circle
+            className="about-pupil"
+            cx="50"
+            cy="50"
+            r="20.91"
+            fill="#000000"
+          />
+        </g>
+      </g>
+    </svg>
+  );
 };
 
-const ext = (url) =>
-  url.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {};
-
-const EQUATIONS = [
-  {
-    tag: "Mathematics",
-    node: (
-      <>
-        e<sup>iπ</sup> + 1 = 0
-      </>
-    ),
-  },
-  {
-    tag: "Motion",
-    node: (
-      <>
-        x(t) = x<sub>0</sub> + v<sub>0</sub>t + ½at<sup>2</sup>
-      </>
-    ),
-  },
-  { tag: "Markets", node: <>∂V/∂t + ½σ²S² ∂²V/∂S² + rS ∂V/∂S − rV = 0</> },
-  { tag: "Story", node: <>r = cos(5θ)</> },
-];
-
-/* rose curve r = cos(5θ), drawn on scroll */
-const ROSE_D = Array.from({ length: 361 }, (_, i) => {
-  const t = (i * Math.PI) / 360;
-  const r = 42 * Math.cos(5 * t);
-  return `${i ? "L" : "M"}${(50 + r * Math.cos(t)).toFixed(2)} ${(50 + r * Math.sin(t)).toFixed(2)}`;
-}).join("");
-
-/* ───────────── component ───────────── */
-const Story = () => {
+const About = () => {
   const root = useRef(null);
-  const b1 = useRef(null);
-  const b2 = useRef(null);
-  const b3 = useRef(null);
-  const rose = useRef(null);
-  const dot = useRef(null);
+  const track = useRef(null);
+  const line = useRef(null);
+  const photo = useRef(null);
 
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
+  useLayoutEffect(() => {
+    const el = root.current;
+    const row = track.current;
+    const text = line.current;
+    const frame = photo.current;
+    if (!el || !row || !text || !frame) return;
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const opts = {
-          type: "words,chars",
-          wordsClass: "story-word",
-          charsClass: "story-char",
-        };
+    const rand = (min, max) => gsap.utils.random(min, max);
+    const mm = gsap.matchMedia();
+    let split = null;
 
-        const s1 = SplitText.create(
-          b1.current.querySelector(".story-big"),
-          opts,
-        );
-        const s2 = SplitText.create(
-          b2.current.querySelectorAll(".story-text"),
-          { ...opts, aria: "none" },
-        );
-        const s3 = SplitText.create(b3.current.querySelectorAll(".story-eq"), {
-          type: "chars",
-          charsClass: "story-char",
-        });
-
-        // each word's resting color (links, <strong>, <em> keep their own)
-        const finals = s2.words.map((el) => getComputedStyle(el).color);
-
-        /* beat 1 — scroll reveal: chars rise as the section arrives */
-        gsap.from(s1.chars, {
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const rises = gsap.utils.toArray(".about-rise", el);
+      if (rises.length) {
+        gsap.from(rises, {
+          y: 32,
+          opacity: 0,
+          duration: 0.85,
+          stagger: 0.08,
+          ease: "power3.out",
+          clearProps: "transform",
           scrollTrigger: {
-            trigger: root.current,
-            start: "top 55%",
+            trigger: el,
+            start: "top 80%",
             toggleActions: "play none none reverse",
           },
-          duration: 0.6,
-          ease: "circ.out",
-          y: 80,
-          autoAlpha: 0,
-          stagger: 0.02,
         });
+      }
 
-        /* the story: pinned, scrubbed */
-        gsap.set([b2.current, b3.current], { autoAlpha: 0 });
+      split = SplitText.create(text, { type: "chars, words" });
+      const words = split.words;
+      const chars = split.chars;
 
-        const path = rose.current;
-        const total = path.getTotalLength();
-        const tip = { p: 0 };
+      /* how far the row travels so its last item (the photo) lands on screen */
+      const distance = () => row.offsetWidth - window.innerWidth;
 
-        const tl = gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top top",
-            end: "+=400%",
-            pin: true,
-            scrub: 1,
-            anticipatePin: 1,
-          },
-        });
-
-        /* beat 1 → beat 2 */
-        tl.to(
-          b1.current,
-          { autoAlpha: 0, y: -60, duration: 1, ease: "power2.in" },
-          1.2,
-        )
-          .set(b2.current, { autoAlpha: 1 }, 1.8)
-          .from(
-            s2.chars,
-            {
-              autoAlpha: 0,
-              scale: 3,
-              force3D: true,
-              duration: 0.6,
-              ease: "back.out(1.4)",
-              stagger: 0.008,
-            },
-            2,
-          )
-          /* words flash white, then settle back to their own color */
-          .to(
-            s2.words,
-            { color: "#ffffff", scale: 0.94, duration: 0.2, stagger: 0.03 },
-            4.6,
-          )
-          .to(
-            s2.words,
-            { color: (i) => finals[i], scale: 1, duration: 0.4, stagger: 0.03 },
-            4.7,
-          )
-
-          /* beat 2 → beat 3 */
-          .to(
-            b2.current,
-            { autoAlpha: 0, y: -60, duration: 1, ease: "power2.in" },
-            7.4,
-          )
-          .set(b3.current, { autoAlpha: 1 }, 8);
-
-        b3.current.querySelectorAll(".story-eq-row").forEach((row, i) => {
-          const chars = s3.chars.filter((c) => row.contains(c));
-          tl.from(
-            row.querySelector(".about-tag"),
-            { autoAlpha: 0, x: -20, duration: 0.5 },
-            8.2 + i * 1.1,
-          ).from(
-            chars,
-            {
-              autoAlpha: 0,
-              scale: 3,
-              force3D: true,
-              duration: 0.5,
-              stagger: 0.02,
-            },
-            8.3 + i * 1.1,
-          );
-        });
-
-        tl.from(path, { strokeDashoffset: 1, duration: 4 }, 8.4)
-          .to(
-            tip,
-            {
-              p: 1,
-              duration: 4,
-              onUpdate: () => {
-                const pt = path.getPointAtLength(tip.p * total);
-                dot.current.setAttribute("cx", pt.x);
-                dot.current.setAttribute("cy", pt.y);
-              },
-            },
-            8.4,
-          )
-          .from(".story-qed", { autoAlpha: 0, y: 20, duration: 0.6 }, 12.6)
-          .to({}, { duration: 1 });
-
-        return () => {
-          s1.revert();
-          s2.revert();
-          s3.revert();
-        };
+      /* 1. pin one full screen: the sentence slides across it,
+            then the finished scene holds for a moment */
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top top",
+        end: () => "+=" + (distance() + window.innerHeight * HOLD),
+        pin: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        refreshPriority: 3,
       });
 
-      document.fonts?.ready.then(() => ScrollTrigger.refresh());
-    },
-    { scope: root },
-  );
+      const slide = gsap.to(row, {
+        x: () => -distance(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: el,
+          start: "top top",
+          end: () => "+=" + distance(),
+          scrub: true,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      /* 2. each letter springs out of place as it passes the centre */
+      chars.forEach((char) => {
+        gsap.from(char, {
+          yPercent: () => rand(-200, 200),
+          rotation: () => rand(-20, 20),
+          ease: "back.out(1.2)",
+          scrollTrigger: {
+            trigger: char,
+            containerAnimation: slide,
+            start: "left 100%",
+            end: "left 30%",
+            scrub: 1,
+          },
+        });
+      });
+
+      /* 3. the photo develops as it slides into view */
+      const img = frame.querySelector("img");
+      if (img) {
+        gsap.from(img, {
+          scale: 1.35,
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: frame,
+            containerAnimation: slide,
+            start: "left 95%",
+            end: "left 55%",
+            scrub: 1,
+          },
+        });
+      }
+
+      /* 4. the 3D word intro, plays once as the section arrives */
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: el, start: "top 65%", once: true },
+      });
+
+      words.forEach((w) =>
+        tl.from(
+          w,
+          {
+            z: rand(-500, 300),
+            opacity: 0,
+            rotationY: rand(-40, 40),
+            duration: 1.5,
+            ease: "power3.out",
+          },
+          Math.random() * 1.5,
+        ),
+      );
+      tl.from(
+        text,
+        {
+          rotationY: 180,
+          transformOrigin: "50% 75% 200",
+          duration: 3,
+          ease: "power2.out",
+        },
+        0,
+      );
+
+      tl.addLabel("pulse", ">");
+      words.forEach((w) => {
+        const z = rand(-50, 50);
+        tl.to(w, { z, opacity: (z + 50) / 100, duration: 0.5 }, "pulse");
+      });
+      tl.to(text, { rotationY: 20, duration: 0.5 }, "pulse");
+
+      tl.addLabel("pulse2", ">");
+      words.forEach((w) => {
+        const z = rand(-100, 100);
+        tl.to(w, { z, opacity: (z + 100) / 200, duration: 0.5 }, "pulse2");
+      });
+      tl.to(text, { rotationX: -35, rotationY: 0, duration: 0.5 }, "pulse2");
+
+      tl.addLabel("reset", ">");
+      tl.to(words, { z: 0, opacity: 1, duration: 0.5 }, "reset");
+      tl.to(text, { rotationX: 0, rotationY: 0, duration: 0.5 }, "reset");
+
+      return () => {
+        split?.revert();
+        split = null;
+      };
+    });
+
+    /* both eyes follow the cursor, only while the screen is showing */
+    const eyes = Array.from(el.querySelectorAll(".about-eye"));
+    const pupils = Array.from(el.querySelectorAll(".about-pupil"));
+    let inView = false;
+    const io = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+    });
+    io.observe(el);
+
+    const onMove = (e) => {
+      if (!inView) return;
+      eyes.forEach((eye, i) => {
+        const r = eye.ownerSVGElement.getBoundingClientRect();
+        const x = e.clientX - (r.left + r.width / 2);
+        const y = e.clientY - (r.top + r.height / 2);
+        const px = gsap.utils.clamp(
+          -LOOK,
+          LOOK,
+          (x / (window.innerWidth / 2)) * LOOK,
+        );
+        const py = gsap.utils.clamp(
+          -LOOK,
+          LOOK,
+          (y / (window.innerHeight / 2)) * LOOK,
+        );
+
+        gsap.to(pupils[i], {
+          xPercent: px,
+          yPercent: py,
+          duration: 0.2,
+          overwrite: "auto",
+        });
+        gsap.to(eye, {
+          xPercent: px * 0.4,
+          yPercent: py * 0.4,
+          duration: 0.2,
+          overwrite: "auto",
+        });
+      });
+    };
+    window.addEventListener("pointermove", onMove);
+
+    let cancelled = false;
+    document.fonts?.ready.then(() => {
+      if (!cancelled) ScrollTrigger.refresh();
+    });
+
+    return () => {
+      cancelled = true;
+      io.disconnect();
+      window.removeEventListener("pointermove", onMove);
+      gsap.killTweensOf([...eyes, ...pupils]);
+      mm.revert();
+    };
+  }, []);
 
   return (
-    <section id="story" ref={root}>
-      <div className="story-grid" aria-hidden="true" />
-
-      <div className="story-stage">
-        {/* 01 — intro */}
-        <div className="story-beat story-beat--1" ref={b1}>
-          <p className="about-tag">[ 01 / Intro ]</p>
-          <h2 className="story-big">
-            I’m a creative developer, fascinated by the intersection of{" "}
-            <em>mathematics</em>, <em>motion</em> and{" "}
-            <em>visual storytelling</em>.
+    <section id="about">
+      <div className="about-stage" ref={root}>
+        <div className="about-head">
+          <p className="about-kicker about-rise">Hi, I’m Ryan</p>
+          <h2 className="about-big about-rise">
+            A <strong>Creative</strong> developer
           </h2>
         </div>
 
-        {/* 02 — background */}
-        <div className="story-beat story-beat--2" ref={b2}>
-          <p className="about-tag">[ 02 / Background ]</p>
-          <p className="story-text">
-            I studied pure <strong>mathematics</strong> and computer science at{" "}
-            <a href={LINKS.mmu} {...ext(LINKS.mmu)}>
-              Multimedia University of Kenya
-            </a>{" "}
-            🎓, and I still build every interface like a proof:{" "}
-            <em>structure first</em>, then make it feel{" "}
-            <strong>inevitable</strong> ✨.
+        <div className="about-track" ref={track}>
+          <p className="about-line" ref={line}>
+            fascinated by the intersection of
           </p>
-          <p className="story-text">
-            I make trading platforms 📈, dashboards 📊 and games 🎮, and
-            co-found{" "}
-            <a href={LINKS.nbx} {...ext(LINKS.nbx)}>
-              NBX
-            </a>{" "}
-            🔗 and{" "}
-            <a href={LINKS.ystudios} {...ext(LINKS.ystudios)}>
-              YStudios
-            </a>{" "}
-            🎬.
-          </p>
-        </div>
 
-        {/* 03 — proof */}
-        <div className="story-beat story-beat--3" ref={b3}>
-          <div className="story-eqs">
-            <p className="about-tag">[ 03 / Proof ]</p>
-            {EQUATIONS.map(({ tag, node }) => (
-              <div key={tag} className="story-eq-row">
-                <span className="about-tag">[ {tag} ]</span>
-                <p className="story-eq">{node}</p>
-              </div>
-            ))}
-            <p className="about-tag story-qed">[ Q.E.D. ] ∎</p>
+          <p className="about-line" ref={line}>
+            <strong>math</strong>,
+            <img src="/images/plus.png" className="size-10" />
+          </p>
+          <p className="about-line" ref={line}>
+            <strong>motion</strong> and.
+          </p>
+          <p className="font-vietnam text-6xl">
+            <strong>visual storytelling</strong>
+          </p>
+
+          <div className="about-eyes" aria-hidden="true">
+            <Eye />
+            <Eye />
           </div>
 
-          <figure className="story-rose" aria-hidden="true">
-            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor">
-              <g strokeWidth="0.3" opacity="0.35">
-                <circle cx="50" cy="50" r="42" />
-                <path d="M4 50h92M50 4v92" />
-              </g>
-              <path
-                ref={rose}
-                d={ROSE_D}
-                pathLength="1"
-                strokeDasharray="1"
-                strokeWidth="1"
-                strokeLinejoin="round"
-              />
-              <circle
-                ref={dot}
-                cx="92"
-                cy="50"
-                r="1.8"
-                fill="currentColor"
-                stroke="none"
-              />
-            </svg>
-            <figcaption className="about-tag">r = cos(5θ)</figcaption>
+          <figure className="about-photo" ref={photo}>
+            <span className="about-photo-fallback">{PHOTO}</span>
+            <img
+              src={PHOTO}
+              alt="Ryan Kipkorir"
+              draggable={false}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
           </figure>
         </div>
       </div>
@@ -285,4 +296,4 @@ const Story = () => {
   );
 };
 
-export default Story;
+export default About;
