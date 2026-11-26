@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 import Loading from "./components/Loading";
 import School from "./components/School";
 import Tools from "./components/Tools";
+import { Analytics } from "@vercel/analytics/react";
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const App = () => {
@@ -46,6 +47,7 @@ const App = () => {
   return (
     <>
       <main aria-hidden={isLoading}>
+        <Analytics />
         <Navbar />
         <Hero />
         <About />
